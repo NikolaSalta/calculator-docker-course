@@ -58,6 +58,7 @@ htmlcov/
 test-reports/
 *.html
 !frontend/public/index.html
+!index.html
 !documents/*.html
 
 # ─────────────────────────────────────────────────────────────────────────────

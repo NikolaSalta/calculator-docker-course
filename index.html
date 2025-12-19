@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Quiz - Интерактивный тест</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        /* Mode Selection */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-5px);
+            border-color: #00d4ff;
+        }
+
+        .mode-card.active {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .mode-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .mode-card h3 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .mode-card p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .category-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+
+        /* Start Button */
+        .start-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quiz Container */
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .question-number {
+            color: #00d4ff;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Flashcard Mode */
+        .flashcard {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .flashcard-inner {
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            backface-visibility: hidden;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: rotateY(180deg) translate(-50%, -50%);
+            width: 100%;
+        }
+
+        .flip-hint {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .answer-text {
+            font-size: 1.2rem;
+            color: #00d4ff;
+            line-height: 1.6;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Answer Options (Quiz Mode) */
+        .answer-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-option {
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .answer-option:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .answer-option.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .answer-option.correct {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .answer-option.incorrect {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.2);
+        }
+
+        /* Input Answer */
+        .answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: #00d4ff;
+        }
+
+        .answer-input::placeholder {
+            color: #666;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.correct {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid #00ff88;
+        }
+
+        .feedback.incorrect {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid #ff4757;
+        }
+
+        .feedback-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback h4 {
+            margin-bottom: 10px;
+        }
+
+        /* Results */
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .results-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .results-text {
+            font-size: 1.3rem;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .results-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-stat {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .result-stat .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .result-stat .label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .result-stat.correct .number {
+            color: #00ff88;
+        }
+
+        .result-stat.incorrect .number {
+            color: #ff4757;
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Timer */
+        .timer {
+            font-size: 1.2rem;
+            color: #00d4ff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .results-details {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        /* Knowledge indicators */
+        .knowledge-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .knowledge-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .knowledge-btn.knew {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .knowledge-btn.didnt-know {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+
+        .knowledge-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🐳 Docker Quiz</h1>
+            <p>Интерактивный тест по Docker, Compose и контейнеризации</p>
+        </div>
+
+        <!-- Setup Screen -->
+        <div id="setup-screen">
+            <!-- Mode Selection -->
+            <h2 style="text-align: center; margin-bottom: 20px; color: #aaa;">Выбери режим</h2>
+            <div class="mode-selection">
+                <div class="mode-card active" data-mode="flashcards">
+                    <div class="icon">🎴</div>
+                    <h3>Флеш-карты</h3>
+                    <p>Изучай вопросы и ответы, отмечай знаешь/не знаешь</p>
+                </div>
+                <div class="mode-card" data-mode="quiz">
+                    <div class="icon">📝</div>
+                    <h3>Тест</h3>
+                    <p>Выбирай правильный ответ из вариантов</p>
+                </div>
+                <div class="mode-card" data-mode="typing">
+                    <div class="icon">⌨️</div>
+                    <h3>Ввод ответа</h3>
+                    <p>Вводи ответ самостоятельно</p>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <h2 style="text-align: center; margin-bottom: 20px; color: #aaa;">Выбери темы</h2>
+            <div class="category-filter">
+                <button class="category-btn active" data-category="all">Все вопросы (64)</button>
+                <button class="category-btn" data-category="docker-basics">Docker основы</button>
+                <button class="category-btn" data-category="dockerfile">Dockerfile</button>
+                <button class="category-btn" data-category="network">Сети и порты</button>
+                <button class="category-btn" data-category="compose">Docker Compose</button>
+                <button class="category-btn" data-category="commands">Команды</button>
+                <button class="category-btn" data-category="testing">Тестирование</button>
+            </div>
+
+            <!-- Settings -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label style="color: #aaa;">
+                    <input type="checkbox" id="shuffle-checkbox" checked> Перемешать вопросы
+                </label>
+                <span style="margin: 0 20px; color: #555;">|</span>
+                <label style="color: #aaa;">
+                    Количество вопросов: 
+                    <select id="question-count" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="all" selected>Все</option>
+                    </select>
+                </label>
+            </div>
+
+            <button class="start-btn" id="start-btn">🚀 Начать</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-container" id="quiz-screen">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="current-question">1</div>
+                    <div class="stat-label">Вопрос</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Правильно</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value timer" id="timer">00:00</div>
+                    <div class="stat-label">Время</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Вопрос 1 из 64</div>
+
+            <!-- Question Card -->
+            <div class="question-card" id="question-card">
+                <div class="question-number" id="question-category">Docker основы</div>
+                <div class="question-text" id="question-text">Вопрос загружается...</div>
+
+                <!-- Flashcard content -->
+                <div id="flashcard-content" class="hidden">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <p class="flip-hint">👆 Нажми, чтобы увидеть ответ</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="answer-text" id="flashcard-answer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="knowledge-btns" id="knowledge-btns" style="display: none;">
+                        <button class="knowledge-btn knew" id="knew-btn">✓ Знал(а)</button>
+                        <button class="knowledge-btn didnt-know" id="didnt-know-btn">✗ Не знал(а)</button>
+                    </div>
+                </div>
+
+                <!-- Quiz content -->
+                <div id="quiz-content" class="hidden">
+                    <div class="answer-options" id="answer-options"></div>
+                </div>
+
+                <!-- Typing content -->
+                <div id="typing-content" class="hidden">
+                    <input type="text" class="answer-input" id="answer-input" placeholder="Введи ответ...">
+                    <button class="nav-btn primary" id="check-answer-btn" style="margin-top: 15px; width: 100%;">Проверить</button>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback" id="feedback">
+                    <div class="feedback-icon" id="feedback-icon"></div>
+                    <h4 id="feedback-title"></h4>
+                    <p id="feedback-text"></p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" id="prev-btn">← Назад</button>
+                <button class="nav-btn primary" id="next-btn">Далее →</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-container" id="results-screen">
+            <div class="results-card">
+                <h2 style="margin-bottom: 20px;">🎉 Тест завершён!</h2>
+                <div class="results-score" id="final-score">85%</div>
+                <div class="results-text" id="results-message">Отличный результат!</div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct">
+                        <div class="number" id="correct-count">17</div>
+                        <div class="label">Правильно</div>
+                    </div>
+                    <div class="result-stat incorrect">
+                        <div class="number" id="incorrect-count">3</div>
+                        <div class="label">Неправильно</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="number" id="total-time">05:32</div>
+                        <div class="label">Время</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons" style="justify-content: center;">
+                    <button class="nav-btn secondary" id="review-btn">📋 Посмотреть ответы</button>
+                    <button class="nav-btn primary" id="restart-btn">🔄 Начать заново</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questions data from CSV
+        const allQuestions = [
+            { q: "Что такое Docker, согласно глоссарию?", a: "Программа для контейнеризации приложений.", category: "docker-basics" },
+            { q: "Простыми словами, что позволяет делать Docker?", a: "\"Упаковать\" приложение со всеми зависимостями в \"контейнер\", который будет работать одинаково на любом компьютере.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker?", a: "Контейнер для переезда: все вещи складываются в коробку и остаются на месте, куда бы вы ни переехали.", category: "docker-basics" },
+            { q: "Что такое Docker Image (Образ)?", a: "Неизменяемый шаблон для создания контейнеров, содержащий ОС, приложение и все его зависимости.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker Image?", a: "Рецепт торта — сам по себе это не торт, но по нему можно испечь сколько угодно тортов.", category: "docker-basics" },
+            { q: "Что такое Docker Container (Контейнер)?", a: "Запущенный экземпляр образа; реально работающее приложение.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker Container?", a: "Испечённый торт — конкретный торт, сделанный по рецепту.", category: "docker-basics" },
+            { q: "Что такое Dockerfile?", a: "Текстовый файл с пошаговыми инструкциями для создания образа Docker.", category: "dockerfile" },
+            { q: "Что представляет собой Docker Daemon простыми словами?", a: "Фоновая служба, которая управляет Docker, аналог \"повара на кухне\".", category: "docker-basics" },
+            { q: "Что делать, если возникает ошибка \"Cannot connect to Docker daemon\"?", a: "Запустить Docker Desktop (на Mac/Windows) или выполнить `sudo systemctl start docker` (на Linux).", category: "commands" },
+            { q: "Что такое Docker Hub?", a: "Онлайн-хранилище образов Docker, аналог App Store для Docker.", category: "docker-basics" },
+            { q: "В сетевых терминах, что такое Port (Порт)?", a: "Числовой адрес для сетевого соединения, аналог \"номера квартиры\" внутри компьютера.", category: "network" },
+            { q: "Какой стандартный порт используется для HTTP?", a: "80", category: "network" },
+            { q: "Какой стандартный порт используется для HTTPS?", a: "443", category: "network" },
+            { q: "Что такое Port Mapping (Проброс портов) в Docker?", a: "Связывание порта хоста с портом контейнера для создания \"моста\" к изолированному контейнеру.", category: "network" },
+            { q: "В каком формате указывается проброс портов в Docker?", a: "-p ПОРТ_ХОСТА:ПОРТ_КОНТЕЙНЕРА", category: "network" },
+            { q: "Что такое Host (Хост) в контексте Docker?", a: "Ваш физический компьютер (Mac, Windows или Linux), на котором работает Docker.", category: "docker-basics" },
+            { q: "Что такое Docker Network?", a: "Виртуальная сеть, которая позволяет изолированным контейнерам связываться друг с другом по именам.", category: "network" },
+            { q: "Что произойдет, если запустить контейнеры без общей Docker Network?", a: "Внутренний DNS не будет работать, и контейнеры не смогут найти друг друга по именам.", category: "network" },
+            { q: "Что такое DNS простыми словами?", a: "\"Телефонная книга\" интернета, которая преобразует доменные имена в IP-адреса.", category: "network" },
+            { q: "Как контейнеры в одной сети Docker обращаются друг к другу?", a: "По имени контейнера, так как Docker автоматически создает для них DNS-записи.", category: "network" },
+            { q: "Что такое Proxy (Прокси)?", a: "Посредник, который принимает запросы и пересылает их дальше, как секретарь.", category: "network" },
+            { q: "Что такое CORS (Cross-Origin Resource Sharing)?", a: "Политика безопасности браузера, которая по умолчанию запрещает JavaScript делать запросы на другой домен или порт.", category: "network" },
+            { q: "Как прокси (nginx) решает проблему CORS в учебном проекте?", a: "Все запросы идут на один origin (порт 3000), а nginx пересылает запросы /api/* в backend, делая всё одним origin'ом для браузера.", category: "network" },
+            { q: "Что делает флаг `-d` (`--detach`) в Docker?", a: "Запускает контейнер в фоновом режиме, освобождая терминал.", category: "commands" },
+            { q: "Что делает флаг `-p` (`--publish`) в Docker?", a: "Пробрасывает (публикует) порт из контейнера на хост.", category: "commands" },
+            { q: "Что делает флаг `--name` в Docker?", a: "Присваивает имя контейнеру для удобного обращения к нему.", category: "commands" },
+            { q: "Что делает флаг `--rm` в Docker?", a: "Автоматически удаляет контейнер после его остановки.", category: "commands" },
+            { q: "Что делает флаг `-it` в Docker?", a: "Запускает контейнер в интерактивном режиме с подключением псевдотерминала (tty).", category: "commands" },
+            { q: "Что такое Docker Compose?", a: "Инструмент для управления несколькими контейнерами через один конфигурационный файл.", category: "compose" },
+            { q: "Какая аналогия используется для описания Docker Compose?", a: "Дирижёр оркестра, управляющий всеми музыкантами (контейнерами) из одного места.", category: "compose" },
+            { q: "Как называется файл конфигурации для Docker Compose?", a: "docker-compose.yml", category: "compose" },
+            { q: "Что такое Service (Сервис) в контексте Docker Compose?", a: "Один компонент приложения, описанный в docker-compose.yml, который запускается как один или несколько контейнеров.", category: "compose" },
+            { q: "Что делает директива `depends_on` в docker-compose.yml?", a: "Указывает порядок запуска сервисов, гарантируя, что зависимый сервис запустится раньше.", category: "compose" },
+            { q: "Что такое `healthcheck` в Docker Compose?", a: "Механизм периодической проверки работоспособности приложения внутри контейнера.", category: "compose" },
+            { q: "Инструкция Dockerfile, которая указывает базовый образ, называется _____.", a: "FROM", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `WORKDIR` что делает?", a: "Устанавливает рабочую директорию внутри образа для последующих команд.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `COPY` что делает?", a: "Копирует файлы и папки с хост-машины в файловую систему образа.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `RUN` что делает?", a: "Выполняет команду в новом слое во время сборки образа (например, для установки зависимостей).", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `CMD` что делает?", a: "Задает команду по умолчанию, которая будет выполнена при запуске контейнера из этого образа.", category: "dockerfile" },
+            { q: "Что на самом деле делает инструкция `EXPOSE` в Dockerfile?", a: "Только документирует, какой порт приложение намерено использовать; не публикует порт.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `ENV` что делает?", a: "Устанавливает переменную окружения внутри образа.", category: "dockerfile" },
+            { q: "Что такое Backend в контексте веб-разработки?", a: "Серверная часть приложения, отвечающая за бизнес-логику, работу с данными и API.", category: "docker-basics" },
+            { q: "Что такое Frontend в контексте веб-разработки?", a: "Клиентская часть приложения, с которой пользователь взаимодействует в браузере.", category: "docker-basics" },
+            { q: "Что такое API (Application Programming Interface)?", a: "Интерфейс для взаимодействия программ, \"язык общения\" между frontend и backend.", category: "docker-basics" },
+            { q: "Назовите основные HTTP-методы, используемые в REST API, и их назначение.", a: "GET (получить), POST (создать/отправить), PUT (обновить), DELETE (удалить).", category: "docker-basics" },
+            { q: "Что такое JSON?", a: "Текстовый формат для передачи структурированных данных, легко читаемый людьми и машинами.", category: "docker-basics" },
+            { q: "Что такое Smoke Test?", a: "Быстрая базовая проверка, которая отвечает на вопрос \"приложение вообще запускается?\".", category: "testing" },
+            { q: "Что такое Unit Test?", a: "Тест, который проверяет одну маленькую часть кода (например, одну функцию) в изоляции.", category: "testing" },
+            { q: "Что такое Integration Test?", a: "Тест, который проверяет, как несколько компонентов системы работают вместе.", category: "testing" },
+            { q: "Что такое Selenium?", a: "Инструмент для автоматизации действий в настоящем браузере, имитирующий поведение пользователя.", category: "testing" },
+            { q: "Что такое pytest?", a: "Фреймворк для написания и запуска тестов на языке Python.", category: "testing" },
+            { q: "Что такое fixture в pytest?", a: "Функция, которая подготавливает данные или состояние (например, подключение к БД) перед тестом и очищает их после.", category: "testing" },
+            { q: "Что такое assertion в тестировании?", a: "Утверждение в коде теста, которое проверяет, что определенное условие является истинным. Если нет — тест падает.", category: "testing" },
+            { q: "Какая команда используется для сборки Docker-образа из Dockerfile?", a: "docker build -t имя:тег .", category: "commands" },
+            { q: "Какая команда показывает список всех запущенных контейнеров?", a: "docker ps", category: "commands" },
+            { q: "Как посмотреть логи работающего контейнера в реальном времени?", a: "docker logs -f <имя_контейнера>", category: "commands" },
+            { q: "Как зайти внутрь работающего контейнера для отладки?", a: "docker exec -it <имя_контейнера> sh", category: "commands" },
+            { q: "Что делает команда `docker compose up --build`?", a: "Пересобирает образы, если Dockerfile изменились, и запускает все сервисы, описанные в docker-compose.yml.", category: "compose" },
+            { q: "Почему при использовании Docker Compose не нужно вручную создавать сеть для контейнеров?", a: "Потому что Docker Compose автоматически создает сеть по умолчанию для всех сервисов в файле.", category: "compose" },
+            { q: "Как frontend-контейнер находит backend-контейнер при использовании Docker Compose?", a: "По имени сервиса, указанному в файле docker-compose.yml (например, 'backend').", category: "compose" },
+            { q: "Какой URL используется для доступа к UI калькулятора в учебном проекте?", a: "http://localhost:3000", category: "network" },
+            { q: "Какой URL используется для доступа к Selenium Grid UI при запуске тестов?", a: "http://localhost:4444", category: "testing" },
+            { q: "В файле nginx.conf учебного проекта, что означает директива `proxy_pass http://calc-backend:8080;`?", a: "Она перенаправляет запросы, пришедшие на определенный location, на сервис `calc-backend` на порт 8080.", category: "network" }
+        ];
+
+        // Category labels
+        const categoryLabels = {
+            'docker-basics': 'Docker основы',
+            'dockerfile': 'Dockerfile',
+            'network': 'Сети и порты',
+            'compose': 'Docker Compose',
+            'commands': 'Команды',
+            'testing': 'Тестирование'
+        };
+
+        // State
+        let currentMode = 'flashcards';
+        let currentCategory = 'all';
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let answers = [];
+        let timerInterval;
+        let startTime;
+        let isFlipped = false;
+
+        // DOM Elements
+        const setupScreen = document.getElementById('setup-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        // Mode selection
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                currentMode = card.dataset.mode;
+            });
+        });
+
+        // Category selection
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+            });
+        });
+
+        // Start button
+        document.getElementById('start-btn').addEventListener('click', startQuiz);
+
+        // Navigation
+        document.getElementById('prev-btn').addEventListener('click', prevQuestion);
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+        document.getElementById('review-btn').addEventListener('click', reviewAnswers);
+
+        // Flashcard
+        document.getElementById('flashcard').addEventListener('click', flipCard);
+        document.getElementById('knew-btn').addEventListener('click', () => markKnowledge(true));
+        document.getElementById('didnt-know-btn').addEventListener('click', () => markKnowledge(false));
+
+        // Typing mode
+        document.getElementById('check-answer-btn').addEventListener('click', checkTypedAnswer);
+        document.getElementById('answer-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkTypedAnswer();
+        });
+
+        function startQuiz() {
+            // Filter questions by category
+            if (currentCategory === 'all') {
+                questions = [...allQuestions];
+            } else {
+                questions = allQuestions.filter(q => q.category === currentCategory);
+            }
+
+            // Shuffle if needed
+            if (document.getElementById('shuffle-checkbox').checked) {
+                questions = shuffleArray(questions);
+            }
+
+            // Limit questions
+            const countSelect = document.getElementById('question-count').value;
+            if (countSelect !== 'all') {
+                questions = questions.slice(0, parseInt(countSelect));
+            }
+
+            // Reset state
+            currentIndex = 0;
+            score = 0;
+            answers = new Array(questions.length).fill(null);
+            isFlipped = false;
+
+            // Start timer
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Show quiz screen
+            setupScreen.style.display = 'none';
+            quizScreen.classList.add('active');
+            resultsScreen.classList.remove('active');
+
+            // Setup content based on mode
+            setupMode();
+            showQuestion();
+        }
+
+        function setupMode() {
+            const flashcardContent = document.getElementById('flashcard-content');
+            const quizContent = document.getElementById('quiz-content');
+            const typingContent = document.getElementById('typing-content');
+
+            flashcardContent.classList.add('hidden');
+            quizContent.classList.add('hidden');
+            typingContent.classList.add('hidden');
+
+            if (currentMode === 'flashcards') {
+                flashcardContent.classList.remove('hidden');
+            } else if (currentMode === 'quiz') {
+                quizContent.classList.remove('hidden');
+            } else if (currentMode === 'typing') {
+                typingContent.classList.remove('hidden');
+            }
+        }
+
+        function showQuestion() {
+            const question = questions[currentIndex];
+            
+            // Update progress
+            document.getElementById('current-question').textContent = currentIndex + 1;
+            document.getElementById('score').textContent = score;
+            document.getElementById('progress-text').textContent = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+            
+            // Update question
+            document.getElementById('question-category').textContent = categoryLabels[question.category] || question.category;
+            document.getElementById('question-text').textContent = question.q;
+
+            // Hide feedback
+            document.getElementById('feedback').classList.remove('show');
+
+            // Mode-specific setup
+            if (currentMode === 'flashcards') {
+                document.getElementById('flashcard').classList.remove('flipped');
+                document.getElementById('flashcard-answer').textContent = question.a;
+                document.getElementById('knowledge-btns').style.display = 'none';
+                isFlipped = false;
+            } else if (currentMode === 'quiz') {
+                generateOptions(question);
+            } else if (currentMode === 'typing') {
+                document.getElementById('answer-input').value = '';
+                document.getElementById('answer-input').focus();
+                document.getElementById('check-answer-btn').disabled = false;
+            }
+
+            // Update navigation
+            document.getElementById('prev-btn').disabled = currentIndex === 0;
+            
+            if (currentIndex === questions.length - 1) {
+                document.getElementById('next-btn').textContent = 'Завершить 🎉';
+            } else {
+                document.getElementById('next-btn').textContent = 'Далее →';
+            }
+        }
+
+        function generateOptions(question) {
+            const optionsContainer = document.getElementById('answer-options');
+            optionsContainer.innerHTML = '';
+
+            // Get wrong answers from other questions
+            let wrongAnswers = allQuestions
+                .filter(q => q.a !== question.a && q.category === question.category)
+                .map(q => q.a);
+            
+            if (wrongAnswers.length < 3) {
+                wrongAnswers = allQuestions
+                    .filter(q => q.a !== question.a)
+                    .map(q => q.a);
+            }
+
+            wrongAnswers = shuffleArray(wrongAnswers).slice(0, 3);
+            
+            // Combine and shuffle options
+            const options = shuffleArray([question.a, ...wrongAnswers]);
+
+            options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'answer-option';
+                optionEl.textContent = option;
+                optionEl.addEventListener('click', () => selectOption(optionEl, option, question.a));
+                optionsContainer.appendChild(optionEl);
+            });
+        }
+
+        function selectOption(element, selected, correct) {
+            // Prevent re-selection
+            if (answers[currentIndex] !== null) return;
+
+            const isCorrect = selected === correct;
+            answers[currentIndex] = { selected, correct, isCorrect };
+
+            if (isCorrect) {
+                score++;
+                element.classList.add('correct');
+                showFeedback(true, correct);
+            } else {
+                element.classList.add('incorrect');
+                // Highlight correct answer
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    if (opt.textContent === correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+                showFeedback(false, correct);
+            }
+
+            document.getElementById('score').textContent = score;
+        }
+
+        function checkTypedAnswer() {
+            const input = document.getElementById('answer-input');
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = questions[currentIndex].a.toLowerCase();
+
+            // Simple matching (contains main keywords)
+            const isCorrect = correctAnswer.includes(userAnswer) || 
+                              userAnswer.includes(correctAnswer.split(' ')[0]) ||
+                              similarity(userAnswer, correctAnswer) > 0.6;
+
+            answers[currentIndex] = { 
+                selected: input.value.trim(), 
+                correct: questions[currentIndex].a, 
+                isCorrect 
+            };
+
+            if (isCorrect) {
+                score++;
+            }
+
+            showFeedback(isCorrect, questions[currentIndex].a);
+            document.getElementById('check-answer-btn').disabled = true;
+            document.getElementById('score').textContent = score;
+        }
+
+        function similarity(s1, s2) {
+            let longer = s1.length > s2.length ? s1 : s2;
+            let shorter = s1.length > s2.length ? s2 : s1;
+            if (longer.length === 0) return 1.0;
+            return (longer.length - editDistance(longer, shorter)) / longer.length;
+        }
+
+        function editDistance(s1, s2) {
+            let costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) {
+                        costs[j] = j;
+                    } else if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+
+            if (isFlipped) {
+                document.getElementById('knowledge-btns').style.display = 'flex';
+            }
+        }
+
+        function markKnowledge(knew) {
+            answers[currentIndex] = { isCorrect: knew };
+            if (knew) score++;
+            document.getElementById('score').textContent = score;
+            
+            // Auto advance after short delay
+            setTimeout(() => {
+                if (currentIndex < questions.length - 1) {
+                    nextQuestion();
+                } else {
+                    showResults();
+                }
+            }, 300);
+        }
+
+        function showFeedback(isCorrect, correctAnswer) {
+            const feedback = document.getElementById('feedback');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const text = document.getElementById('feedback-text');
+
+            feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+            icon.textContent = isCorrect ? '✅' : '❌';
+            title.textContent = isCorrect ? 'Правильно!' : 'Неправильно';
+            text.textContent = isCorrect ? 'Отлично, так держать!' : `Правильный ответ: ${correctAnswer}`;
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            document.getElementById('final-score').textContent = `${percentage}%`;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('incorrect-count').textContent = questions.length - score;
+            document.getElementById('total-time').textContent = timeStr;
+
+            let message = '';
+            if (percentage >= 90) message = '🌟 Превосходно! Ты Docker-мастер!';
+            else if (percentage >= 70) message = '👍 Отлично! Хорошие знания!';
+            else if (percentage >= 50) message = '📚 Неплохо, но есть куда расти!';
+            else message = '💪 Продолжай учиться, ты справишься!';
+            
+            document.getElementById('results-message').textContent = message;
+
+            quizScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+        }
+
+        function restartQuiz() {
+            resultsScreen.classList.remove('active');
+            setupScreen.style.display = 'block';
+        }
+
+        function reviewAnswers() {
+            // Simple alert with answers for now
+            let review = 'Обзор ответов:\\n\\n';
+            answers.forEach((answer, index) => {
+                if (answer) {
+                    const icon = answer.isCorrect ? '✅' : '❌';
+                    review += `${icon} Q${index + 1}: ${questions[index].q.substring(0, 50)}...\\n`;
+                }
+            });
+            alert(review);
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Quiz - Интерактивный тест</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        /* Mode Selection */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .mode-card:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-5px);
+            border-color: #00d4ff;
+        }
+
+        .mode-card.active {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .mode-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .mode-card h3 {
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .mode-card p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .category-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+        }
+
+        /* Start Button */
+        .start-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 20px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quiz Container */
+        .quiz-container {
+            display: none;
+        }
+
+        .quiz-container.active {
+            display: block;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .question-number {
+            color: #00d4ff;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Flashcard Mode */
+        .flashcard {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .flashcard-inner {
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            backface-visibility: hidden;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: rotateY(180deg) translate(-50%, -50%);
+            width: 100%;
+        }
+
+        .flip-hint {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        .answer-text {
+            font-size: 1.2rem;
+            color: #00d4ff;
+            line-height: 1.6;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        /* Answer Options (Quiz Mode) */
+        .answer-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .answer-option {
+            padding: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .answer-option:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .answer-option.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .answer-option.correct {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .answer-option.incorrect {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.2);
+        }
+
+        /* Input Answer */
+        .answer-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .answer-input:focus {
+            border-color: #00d4ff;
+        }
+
+        .answer-input::placeholder {
+            color: #666;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.primary {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.correct {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid #00ff88;
+        }
+
+        .feedback.incorrect {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid #ff4757;
+        }
+
+        .feedback-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback h4 {
+            margin-bottom: 10px;
+        }
+
+        /* Results */
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+
+        .results-container.active {
+            display: block;
+        }
+
+        .results-card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .results-score {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .results-text {
+            font-size: 1.3rem;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .results-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .result-stat {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .result-stat .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .result-stat .label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .result-stat.correct .number {
+            color: #00ff88;
+        }
+
+        .result-stat.incorrect .number {
+            color: #ff4757;
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Timer */
+        .timer {
+            font-size: 1.2rem;
+            color: #00d4ff;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .results-details {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+        }
+
+        /* Knowledge indicators */
+        .knowledge-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .knowledge-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .knowledge-btn.knew {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .knowledge-btn.didnt-know {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid #ff4757;
+        }
+
+        .knowledge-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🐳 Docker Quiz</h1>
+            <p>Интерактивный тест по Docker, Compose и контейнеризации</p>
+        </div>
+
+        <!-- Setup Screen -->
+        <div id="setup-screen">
+            <!-- Mode Selection -->
+            <h2 style="text-align: center; margin-bottom: 20px; color: #aaa;">Выбери режим</h2>
+            <div class="mode-selection">
+                <div class="mode-card active" data-mode="flashcards">
+                    <div class="icon">🎴</div>
+                    <h3>Флеш-карты</h3>
+                    <p>Изучай вопросы и ответы, отмечай знаешь/не знаешь</p>
+                </div>
+                <div class="mode-card" data-mode="quiz">
+                    <div class="icon">📝</div>
+                    <h3>Тест</h3>
+                    <p>Выбирай правильный ответ из вариантов</p>
+                </div>
+                <div class="mode-card" data-mode="typing">
+                    <div class="icon">⌨️</div>
+                    <h3>Ввод ответа</h3>
+                    <p>Вводи ответ самостоятельно</p>
+                </div>
+            </div>
+
+            <!-- Category Filter -->
+            <h2 style="text-align: center; margin-bottom: 20px; color: #aaa;">Выбери темы</h2>
+            <div class="category-filter">
+                <button class="category-btn active" data-category="all">Все вопросы (64)</button>
+                <button class="category-btn" data-category="docker-basics">Docker основы</button>
+                <button class="category-btn" data-category="dockerfile">Dockerfile</button>
+                <button class="category-btn" data-category="network">Сети и порты</button>
+                <button class="category-btn" data-category="compose">Docker Compose</button>
+                <button class="category-btn" data-category="commands">Команды</button>
+                <button class="category-btn" data-category="testing">Тестирование</button>
+            </div>
+
+            <!-- Settings -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label style="color: #aaa;">
+                    <input type="checkbox" id="shuffle-checkbox" checked> Перемешать вопросы
+                </label>
+                <span style="margin: 0 20px; color: #555;">|</span>
+                <label style="color: #aaa;">
+                    Количество вопросов: 
+                    <select id="question-count" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 5px 10px; border-radius: 5px;">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="all" selected>Все</option>
+                    </select>
+                </label>
+            </div>
+
+            <button class="start-btn" id="start-btn">🚀 Начать</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div class="quiz-container" id="quiz-screen">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="current-question">1</div>
+                    <div class="stat-label">Вопрос</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Правильно</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value timer" id="timer">00:00</div>
+                    <div class="stat-label">Время</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Вопрос 1 из 64</div>
+
+            <!-- Question Card -->
+            <div class="question-card" id="question-card">
+                <div class="question-number" id="question-category">Docker основы</div>
+                <div class="question-text" id="question-text">Вопрос загружается...</div>
+
+                <!-- Flashcard content -->
+                <div id="flashcard-content" class="hidden">
+                    <div class="flashcard" id="flashcard">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <p class="flip-hint">👆 Нажми, чтобы увидеть ответ</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="answer-text" id="flashcard-answer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="knowledge-btns" id="knowledge-btns" style="display: none;">
+                        <button class="knowledge-btn knew" id="knew-btn">✓ Знал(а)</button>
+                        <button class="knowledge-btn didnt-know" id="didnt-know-btn">✗ Не знал(а)</button>
+                    </div>
+                </div>
+
+                <!-- Quiz content -->
+                <div id="quiz-content" class="hidden">
+                    <div class="answer-options" id="answer-options"></div>
+                </div>
+
+                <!-- Typing content -->
+                <div id="typing-content" class="hidden">
+                    <input type="text" class="answer-input" id="answer-input" placeholder="Введи ответ...">
+                    <button class="nav-btn primary" id="check-answer-btn" style="margin-top: 15px; width: 100%;">Проверить</button>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback" id="feedback">
+                    <div class="feedback-icon" id="feedback-icon"></div>
+                    <h4 id="feedback-title"></h4>
+                    <p id="feedback-text"></p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" id="prev-btn">← Назад</button>
+                <button class="nav-btn primary" id="next-btn">Далее →</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-container" id="results-screen">
+            <div class="results-card">
+                <h2 style="margin-bottom: 20px;">🎉 Тест завершён!</h2>
+                <div class="results-score" id="final-score">85%</div>
+                <div class="results-text" id="results-message">Отличный результат!</div>
+                
+                <div class="results-details">
+                    <div class="result-stat correct">
+                        <div class="number" id="correct-count">17</div>
+                        <div class="label">Правильно</div>
+                    </div>
+                    <div class="result-stat incorrect">
+                        <div class="number" id="incorrect-count">3</div>
+                        <div class="label">Неправильно</div>
+                    </div>
+                    <div class="result-stat">
+                        <div class="number" id="total-time">05:32</div>
+                        <div class="label">Время</div>
+                    </div>
+                </div>
+
+                <div class="nav-buttons" style="justify-content: center;">
+                    <button class="nav-btn secondary" id="review-btn">📋 Посмотреть ответы</button>
+                    <button class="nav-btn primary" id="restart-btn">🔄 Начать заново</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Questions data from CSV
+        const allQuestions = [
+            { q: "Что такое Docker, согласно глоссарию?", a: "Программа для контейнеризации приложений.", category: "docker-basics" },
+            { q: "Простыми словами, что позволяет делать Docker?", a: "\"Упаковать\" приложение со всеми зависимостями в \"контейнер\", который будет работать одинаково на любом компьютере.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker?", a: "Контейнер для переезда: все вещи складываются в коробку и остаются на месте, куда бы вы ни переехали.", category: "docker-basics" },
+            { q: "Что такое Docker Image (Образ)?", a: "Неизменяемый шаблон для создания контейнеров, содержащий ОС, приложение и все его зависимости.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker Image?", a: "Рецепт торта — сам по себе это не торт, но по нему можно испечь сколько угодно тортов.", category: "docker-basics" },
+            { q: "Что такое Docker Container (Контейнер)?", a: "Запущенный экземпляр образа; реально работающее приложение.", category: "docker-basics" },
+            { q: "Какая аналогия используется для описания Docker Container?", a: "Испечённый торт — конкретный торт, сделанный по рецепту.", category: "docker-basics" },
+            { q: "Что такое Dockerfile?", a: "Текстовый файл с пошаговыми инструкциями для создания образа Docker.", category: "dockerfile" },
+            { q: "Что представляет собой Docker Daemon простыми словами?", a: "Фоновая служба, которая управляет Docker, аналог \"повара на кухне\".", category: "docker-basics" },
+            { q: "Что делать, если возникает ошибка \"Cannot connect to Docker daemon\"?", a: "Запустить Docker Desktop (на Mac/Windows) или выполнить `sudo systemctl start docker` (на Linux).", category: "commands" },
+            { q: "Что такое Docker Hub?", a: "Онлайн-хранилище образов Docker, аналог App Store для Docker.", category: "docker-basics" },
+            { q: "В сетевых терминах, что такое Port (Порт)?", a: "Числовой адрес для сетевого соединения, аналог \"номера квартиры\" внутри компьютера.", category: "network" },
+            { q: "Какой стандартный порт используется для HTTP?", a: "80", category: "network" },
+            { q: "Какой стандартный порт используется для HTTPS?", a: "443", category: "network" },
+            { q: "Что такое Port Mapping (Проброс портов) в Docker?", a: "Связывание порта хоста с портом контейнера для создания \"моста\" к изолированному контейнеру.", category: "network" },
+            { q: "В каком формате указывается проброс портов в Docker?", a: "-p ПОРТ_ХОСТА:ПОРТ_КОНТЕЙНЕРА", category: "network" },
+            { q: "Что такое Host (Хост) в контексте Docker?", a: "Ваш физический компьютер (Mac, Windows или Linux), на котором работает Docker.", category: "docker-basics" },
+            { q: "Что такое Docker Network?", a: "Виртуальная сеть, которая позволяет изолированным контейнерам связываться друг с другом по именам.", category: "network" },
+            { q: "Что произойдет, если запустить контейнеры без общей Docker Network?", a: "Внутренний DNS не будет работать, и контейнеры не смогут найти друг друга по именам.", category: "network" },
+            { q: "Что такое DNS простыми словами?", a: "\"Телефонная книга\" интернета, которая преобразует доменные имена в IP-адреса.", category: "network" },
+            { q: "Как контейнеры в одной сети Docker обращаются друг к другу?", a: "По имени контейнера, так как Docker автоматически создает для них DNS-записи.", category: "network" },
+            { q: "Что такое Proxy (Прокси)?", a: "Посредник, который принимает запросы и пересылает их дальше, как секретарь.", category: "network" },
+            { q: "Что такое CORS (Cross-Origin Resource Sharing)?", a: "Политика безопасности браузера, которая по умолчанию запрещает JavaScript делать запросы на другой домен или порт.", category: "network" },
+            { q: "Как прокси (nginx) решает проблему CORS в учебном проекте?", a: "Все запросы идут на один origin (порт 3000), а nginx пересылает запросы /api/* в backend, делая всё одним origin'ом для браузера.", category: "network" },
+            { q: "Что делает флаг `-d` (`--detach`) в Docker?", a: "Запускает контейнер в фоновом режиме, освобождая терминал.", category: "commands" },
+            { q: "Что делает флаг `-p` (`--publish`) в Docker?", a: "Пробрасывает (публикует) порт из контейнера на хост.", category: "commands" },
+            { q: "Что делает флаг `--name` в Docker?", a: "Присваивает имя контейнеру для удобного обращения к нему.", category: "commands" },
+            { q: "Что делает флаг `--rm` в Docker?", a: "Автоматически удаляет контейнер после его остановки.", category: "commands" },
+            { q: "Что делает флаг `-it` в Docker?", a: "Запускает контейнер в интерактивном режиме с подключением псевдотерминала (tty).", category: "commands" },
+            { q: "Что такое Docker Compose?", a: "Инструмент для управления несколькими контейнерами через один конфигурационный файл.", category: "compose" },
+            { q: "Какая аналогия используется для описания Docker Compose?", a: "Дирижёр оркестра, управляющий всеми музыкантами (контейнерами) из одного места.", category: "compose" },
+            { q: "Как называется файл конфигурации для Docker Compose?", a: "docker-compose.yml", category: "compose" },
+            { q: "Что такое Service (Сервис) в контексте Docker Compose?", a: "Один компонент приложения, описанный в docker-compose.yml, который запускается как один или несколько контейнеров.", category: "compose" },
+            { q: "Что делает директива `depends_on` в docker-compose.yml?", a: "Указывает порядок запуска сервисов, гарантируя, что зависимый сервис запустится раньше.", category: "compose" },
+            { q: "Что такое `healthcheck` в Docker Compose?", a: "Механизм периодической проверки работоспособности приложения внутри контейнера.", category: "compose" },
+            { q: "Инструкция Dockerfile, которая указывает базовый образ, называется _____.", a: "FROM", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `WORKDIR` что делает?", a: "Устанавливает рабочую директорию внутри образа для последующих команд.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `COPY` что делает?", a: "Копирует файлы и папки с хост-машины в файловую систему образа.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `RUN` что делает?", a: "Выполняет команду в новом слое во время сборки образа (например, для установки зависимостей).", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `CMD` что делает?", a: "Задает команду по умолчанию, которая будет выполнена при запуске контейнера из этого образа.", category: "dockerfile" },
+            { q: "Что на самом деле делает инструкция `EXPOSE` в Dockerfile?", a: "Только документирует, какой порт приложение намерено использовать; не публикует порт.", category: "dockerfile" },
+            { q: "Инструкция Dockerfile `ENV` что делает?", a: "Устанавливает переменную окружения внутри образа.", category: "dockerfile" },
+            { q: "Что такое Backend в контексте веб-разработки?", a: "Серверная часть приложения, отвечающая за бизнес-логику, работу с данными и API.", category: "docker-basics" },
+            { q: "Что такое Frontend в контексте веб-разработки?", a: "Клиентская часть приложения, с которой пользователь взаимодействует в браузере.", category: "docker-basics" },
+            { q: "Что такое API (Application Programming Interface)?", a: "Интерфейс для взаимодействия программ, \"язык общения\" между frontend и backend.", category: "docker-basics" },
+            { q: "Назовите основные HTTP-методы, используемые в REST API, и их назначение.", a: "GET (получить), POST (создать/отправить), PUT (обновить), DELETE (удалить).", category: "docker-basics" },
+            { q: "Что такое JSON?", a: "Текстовый формат для передачи структурированных данных, легко читаемый людьми и машинами.", category: "docker-basics" },
+            { q: "Что такое Smoke Test?", a: "Быстрая базовая проверка, которая отвечает на вопрос \"приложение вообще запускается?\".", category: "testing" },
+            { q: "Что такое Unit Test?", a: "Тест, который проверяет одну маленькую часть кода (например, одну функцию) в изоляции.", category: "testing" },
+            { q: "Что такое Integration Test?", a: "Тест, который проверяет, как несколько компонентов системы работают вместе.", category: "testing" },
+            { q: "Что такое Selenium?", a: "Инструмент для автоматизации действий в настоящем браузере, имитирующий поведение пользователя.", category: "testing" },
+            { q: "Что такое pytest?", a: "Фреймворк для написания и запуска тестов на языке Python.", category: "testing" },
+            { q: "Что такое fixture в pytest?", a: "Функция, которая подготавливает данные или состояние (например, подключение к БД) перед тестом и очищает их после.", category: "testing" },
+            { q: "Что такое assertion в тестировании?", a: "Утверждение в коде теста, которое проверяет, что определенное условие является истинным. Если нет — тест падает.", category: "testing" },
+            { q: "Какая команда используется для сборки Docker-образа из Dockerfile?", a: "docker build -t имя:тег .", category: "commands" },
+            { q: "Какая команда показывает список всех запущенных контейнеров?", a: "docker ps", category: "commands" },
+            { q: "Как посмотреть логи работающего контейнера в реальном времени?", a: "docker logs -f <имя_контейнера>", category: "commands" },
+            { q: "Как зайти внутрь работающего контейнера для отладки?", a: "docker exec -it <имя_контейнера> sh", category: "commands" },
+            { q: "Что делает команда `docker compose up --build`?", a: "Пересобирает образы, если Dockerfile изменились, и запускает все сервисы, описанные в docker-compose.yml.", category: "compose" },
+            { q: "Почему при использовании Docker Compose не нужно вручную создавать сеть для контейнеров?", a: "Потому что Docker Compose автоматически создает сеть по умолчанию для всех сервисов в файле.", category: "compose" },
+            { q: "Как frontend-контейнер находит backend-контейнер при использовании Docker Compose?", a: "По имени сервиса, указанному в файле docker-compose.yml (например, 'backend').", category: "compose" },
+            { q: "Какой URL используется для доступа к UI калькулятора в учебном проекте?", a: "http://localhost:3000", category: "network" },
+            { q: "Какой URL используется для доступа к Selenium Grid UI при запуске тестов?", a: "http://localhost:4444", category: "testing" },
+            { q: "В файле nginx.conf учебного проекта, что означает директива `proxy_pass http://calc-backend:8080;`?", a: "Она перенаправляет запросы, пришедшие на определенный location, на сервис `calc-backend` на порт 8080.", category: "network" }
+        ];
+
+        // Category labels
+        const categoryLabels = {
+            'docker-basics': 'Docker основы',
+            'dockerfile': 'Dockerfile',
+            'network': 'Сети и порты',
+            'compose': 'Docker Compose',
+            'commands': 'Команды',
+            'testing': 'Тестирование'
+        };
+
+        // State
+        let currentMode = 'flashcards';
+        let currentCategory = 'all';
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let answers = [];
+        let timerInterval;
+        let startTime;
+        let isFlipped = false;
+
+        // DOM Elements
+        const setupScreen = document.getElementById('setup-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        // Mode selection
+        document.querySelectorAll('.mode-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                currentMode = card.dataset.mode;
+            });
+        });
+
+        // Category selection
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.category;
+            });
+        });
+
+        // Start button
+        document.getElementById('start-btn').addEventListener('click', startQuiz);
+
+        // Navigation
+        document.getElementById('prev-btn').addEventListener('click', prevQuestion);
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+        document.getElementById('review-btn').addEventListener('click', reviewAnswers);
+
+        // Flashcard
+        document.getElementById('flashcard').addEventListener('click', flipCard);
+        document.getElementById('knew-btn').addEventListener('click', () => markKnowledge(true));
+        document.getElementById('didnt-know-btn').addEventListener('click', () => markKnowledge(false));
+
+        // Typing mode
+        document.getElementById('check-answer-btn').addEventListener('click', checkTypedAnswer);
+        document.getElementById('answer-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkTypedAnswer();
+        });
+
+        function startQuiz() {
+            // Filter questions by category
+            if (currentCategory === 'all') {
+                questions = [...allQuestions];
+            } else {
+                questions = allQuestions.filter(q => q.category === currentCategory);
+            }
+
+            // Shuffle if needed
+            if (document.getElementById('shuffle-checkbox').checked) {
+                questions = shuffleArray(questions);
+            }
+
+            // Limit questions
+            const countSelect = document.getElementById('question-count').value;
+            if (countSelect !== 'all') {
+                questions = questions.slice(0, parseInt(countSelect));
+            }
+
+            // Reset state
+            currentIndex = 0;
+            score = 0;
+            answers = new Array(questions.length).fill(null);
+            isFlipped = false;
+
+            // Start timer
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+
+            // Show quiz screen
+            setupScreen.style.display = 'none';
+            quizScreen.classList.add('active');
+            resultsScreen.classList.remove('active');
+
+            // Setup content based on mode
+            setupMode();
+            showQuestion();
+        }
+
+        function setupMode() {
+            const flashcardContent = document.getElementById('flashcard-content');
+            const quizContent = document.getElementById('quiz-content');
+            const typingContent = document.getElementById('typing-content');
+
+            flashcardContent.classList.add('hidden');
+            quizContent.classList.add('hidden');
+            typingContent.classList.add('hidden');
+
+            if (currentMode === 'flashcards') {
+                flashcardContent.classList.remove('hidden');
+            } else if (currentMode === 'quiz') {
+                quizContent.classList.remove('hidden');
+            } else if (currentMode === 'typing') {
+                typingContent.classList.remove('hidden');
+            }
+        }
+
+        function showQuestion() {
+            const question = questions[currentIndex];
+            
+            // Update progress
+            document.getElementById('current-question').textContent = currentIndex + 1;
+            document.getElementById('score').textContent = score;
+            document.getElementById('progress-text').textContent = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+            
+            // Update question
+            document.getElementById('question-category').textContent = categoryLabels[question.category] || question.category;
+            document.getElementById('question-text').textContent = question.q;
+
+            // Hide feedback
+            document.getElementById('feedback').classList.remove('show');
+
+            // Mode-specific setup
+            if (currentMode === 'flashcards') {
+                document.getElementById('flashcard').classList.remove('flipped');
+                document.getElementById('flashcard-answer').textContent = question.a;
+                document.getElementById('knowledge-btns').style.display = 'none';
+                isFlipped = false;
+            } else if (currentMode === 'quiz') {
+                generateOptions(question);
+            } else if (currentMode === 'typing') {
+                document.getElementById('answer-input').value = '';
+                document.getElementById('answer-input').focus();
+                document.getElementById('check-answer-btn').disabled = false;
+            }
+
+            // Update navigation
+            document.getElementById('prev-btn').disabled = currentIndex === 0;
+            
+            if (currentIndex === questions.length - 1) {
+                document.getElementById('next-btn').textContent = 'Завершить 🎉';
+            } else {
+                document.getElementById('next-btn').textContent = 'Далее →';
+            }
+        }
+
+        function generateOptions(question) {
+            const optionsContainer = document.getElementById('answer-options');
+            optionsContainer.innerHTML = '';
+
+            // Get wrong answers from other questions
+            let wrongAnswers = allQuestions
+                .filter(q => q.a !== question.a && q.category === question.category)
+                .map(q => q.a);
+            
+            if (wrongAnswers.length < 3) {
+                wrongAnswers = allQuestions
+                    .filter(q => q.a !== question.a)
+                    .map(q => q.a);
+            }
+
+            wrongAnswers = shuffleArray(wrongAnswers).slice(0, 3);
+            
+            // Combine and shuffle options
+            const options = shuffleArray([question.a, ...wrongAnswers]);
+
+            options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'answer-option';
+                optionEl.textContent = option;
+                optionEl.addEventListener('click', () => selectOption(optionEl, option, question.a));
+                optionsContainer.appendChild(optionEl);
+            });
+        }
+
+        function selectOption(element, selected, correct) {
+            // Prevent re-selection
+            if (answers[currentIndex] !== null) return;
+
+            const isCorrect = selected === correct;
+            answers[currentIndex] = { selected, correct, isCorrect };
+
+            if (isCorrect) {
+                score++;
+                element.classList.add('correct');
+                showFeedback(true, correct);
+            } else {
+                element.classList.add('incorrect');
+                // Highlight correct answer
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    if (opt.textContent === correct) {
+                        opt.classList.add('correct');
+                    }
+                });
+                showFeedback(false, correct);
+            }
+
+            document.getElementById('score').textContent = score;
+        }
+
+        function checkTypedAnswer() {
+            const input = document.getElementById('answer-input');
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = questions[currentIndex].a.toLowerCase();
+
+            // Simple matching (contains main keywords)
+            const isCorrect = correctAnswer.includes(userAnswer) || 
+                              userAnswer.includes(correctAnswer.split(' ')[0]) ||
+                              similarity(userAnswer, correctAnswer) > 0.6;
+
+            answers[currentIndex] = { 
+                selected: input.value.trim(), 
+                correct: questions[currentIndex].a, 
+                isCorrect 
+            };
+
+            if (isCorrect) {
+                score++;
+            }
+
+            showFeedback(isCorrect, questions[currentIndex].a);
+            document.getElementById('check-answer-btn').disabled = true;
+            document.getElementById('score').textContent = score;
+        }
+
+        function similarity(s1, s2) {
+            let longer = s1.length > s2.length ? s1 : s2;
+            let shorter = s1.length > s2.length ? s2 : s1;
+            if (longer.length === 0) return 1.0;
+            return (longer.length - editDistance(longer, shorter)) / longer.length;
+        }
+
+        function editDistance(s1, s2) {
+            let costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) {
+                        costs[j] = j;
+                    } else if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+
+            if (isFlipped) {
+                document.getElementById('knowledge-btns').style.display = 'flex';
+            }
+        }
+
+        function markKnowledge(knew) {
+            answers[currentIndex] = { isCorrect: knew };
+            if (knew) score++;
+            document.getElementById('score').textContent = score;
+            
+            // Auto advance after short delay
+            setTimeout(() => {
+                if (currentIndex < questions.length - 1) {
+                    nextQuestion();
+                } else {
+                    showResults();
+                }
+            }, 300);
+        }
+
+        function showFeedback(isCorrect, correctAnswer) {
+            const feedback = document.getElementById('feedback');
+            const icon = document.getElementById('feedback-icon');
+            const title = document.getElementById('feedback-title');
+            const text = document.getElementById('feedback-text');
+
+            feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'incorrect');
+            icon.textContent = isCorrect ? '✅' : '❌';
+            title.textContent = isCorrect ? 'Правильно!' : 'Неправильно';
+            text.textContent = isCorrect ? 'Отлично, так держать!' : `Правильный ответ: ${correctAnswer}`;
+        }
+
+        function nextQuestion() {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            const percentage = Math.round((score / questions.length) * 100);
+            
+            document.getElementById('final-score').textContent = `${percentage}%`;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('incorrect-count').textContent = questions.length - score;
+            document.getElementById('total-time').textContent = timeStr;
+
+            let message = '';
+            if (percentage >= 90) message = '🌟 Превосходно! Ты Docker-мастер!';
+            else if (percentage >= 70) message = '👍 Отлично! Хорошие знания!';
+            else if (percentage >= 50) message = '📚 Неплохо, но есть куда расти!';
+            else message = '💪 Продолжай учиться, ты справишься!';
+            
+            document.getElementById('results-message').textContent = message;
+
+            quizScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+        }
+
+        function restartQuiz() {
+            resultsScreen.classList.remove('active');
+            setupScreen.style.display = 'block';
+        }
+
+        function reviewAnswers() {
+            // Simple alert with answers for now
+            let review = 'Обзор ответов:\n\n';
+            answers.forEach((answer, index) => {
+                if (answer) {
+                    const icon = answer.isCorrect ? '✅' : '❌';
+                    review += `${icon} Q${index + 1}: ${questions[index].q.substring(0, 50)}...\n`;
+                }
+            });
+            alert(review);
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+    </script>
+</body>
+</html>
