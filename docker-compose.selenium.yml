@@ -156,6 +156,8 @@ services:
     # Без -m фильтра — все тесты
     command: [
       "-v",
+      "-s",
+      "--tb=short",
       "--html=/tests/reports/report.html",
       "--self-contained-html"
     ]

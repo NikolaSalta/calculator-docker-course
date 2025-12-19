@@ -50,6 +50,9 @@ Scope (область действия) fixture:
 # pytest.fixture — декоратор для создания fixtures
 import pytest
 
+# pytest_html — для добавления контента в HTML-отчёт
+from pytest_html import extras
+
 # requests — библиотека для HTTP-запросов
 # Используем для проверки готовности сервисов
 import requests
@@ -366,3 +369,62 @@ def browser():
     # - Занятые порты
     # - Selenium Grid будет считать сессию активной
     driver.quit()
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PYTEST-HTML: ДОБАВЛЕНИЕ DOCSTRINGS В ОТЧЁТ
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Добавляет docstring теста в отчёт pytest-html.
+    """
+    outcome = yield
+    report = outcome.get_result()
+    
+    # Добавляем docstring в extra для pytest-html
+    if report.when == 'call':
+        # Получаем docstring теста
+        docstring = item.function.__doc__
+        if docstring:
+            # Берём первые 3 строки docstring (краткое описание)
+            lines = [line.strip() for line in docstring.strip().split('\n') if line.strip()]
+            description = '\n'.join(lines[:3])
+            
+            # Добавляем в extra для pytest-html
+            extra = getattr(report, 'extra', [])
+            extra.append(extras.html(f'<div class="description"><strong>Описание:</strong><br>{description}</div>'))
+            report.extra = extra
+
+
+def pytest_html_results_table_header(cells):
+    """
+    Добавляет колонку "Описание" в таблицу результатов HTML-отчёта.
+    """
+    cells.insert(2, '<th>Описание</th>')
+
+
+def pytest_html_results_table_row(report, cells):
+    """
+    Добавляет описание теста (docstring) в строку таблицы HTML-отчёта.
+    """
+    # Извлекаем docstring из nodeid
+    if hasattr(report, 'nodeid'):
+        # Получаем краткое описание из первой строки docstring
+        description = '—'
+        
+        # Пытаемся извлечь из extra
+        if hasattr(report, 'extra') and report.extra:
+            for extra in report.extra:
+                if hasattr(extra, 'content') and 'Описание:' in str(extra.content):
+                    # Извлекаем текст описания
+                    import re
+                    match = re.search(r'<strong>Описание:</strong><br>(.*?)</div>', str(extra.content))
+                    if match:
+                        description = match.group(1).replace('\n', '<br>')
+                        break
+        
+        cells.insert(2, f'<td style="max-width: 300px; word-wrap: break-word;">{description}</td>')
+    else:
+        cells.insert(2, '<td>—</td>')
