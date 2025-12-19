@@ -1,0 +1,145 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="11 - Полная карта проекта" id="project-map">
+    <mxGraphModel dx="945" dy="604" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 11: Полная карта проекта Calculator&lt;/h1&gt;&lt;p&gt;Все файлы, их связи и назначение&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="400" y="10" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="root" value="&lt;b&gt;calculator/&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="700" y="70" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-folder" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="40" y="130" width="350" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-title" value="&lt;b&gt;backend/&lt;/b&gt; — Java Spring Boot" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="40" y="135" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="b-dockerfile" value="&lt;b&gt;Dockerfile&lt;/b&gt;&lt;br&gt;Multi-stage build:&lt;br&gt;Maven → JRE Alpine" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="60" y="165" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b-pom" value="&lt;b&gt;pom.xml&lt;/b&gt;&lt;br&gt;Maven config&lt;br&gt;spring-boot-starter-web" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="220" y="165" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b-app" value="&lt;b&gt;CalcApplication.java&lt;/b&gt;&lt;br&gt;@SpringBootApplication&lt;br&gt;Точка входа" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="60" y="230" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b-ctrl" value="&lt;b&gt;CalcController.java&lt;/b&gt;&lt;br&gt;@RestController&lt;br&gt;/api/calc, /api/health" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="220" y="230" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b-output" value="&lt;b&gt;OUTPUT:&lt;/b&gt;&lt;br&gt;app.jar (~10 MB)&lt;br&gt;Image: calc-backend (~150 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="60" y="300" width="310" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b-api" value="API: POST /api/calc {a, b, op} → {result}" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="60" y="360" width="310" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-folder" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="420" y="130" width="400" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-title" value="&lt;b&gt;frontend/&lt;/b&gt; — React + nginx" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="420" y="135" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="f-dockerfile" value="&lt;b&gt;Dockerfile&lt;/b&gt;&lt;br&gt;Node build →&lt;br&gt;nginx Alpine" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="440" y="165" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f-nginx" value="&lt;b&gt;nginx.conf&lt;/b&gt;&lt;br&gt;location /&lt;br&gt;location /api/" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="550" y="165" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f-package" value="&lt;b&gt;package.json&lt;/b&gt;&lt;br&gt;react, react-dom" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="660" y="165" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="f-index" value="&lt;b&gt;index.html&lt;/b&gt;&lt;br&gt;&lt;div id=&quot;root&quot;&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="440" y="230" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="f-indexjs" value="&lt;b&gt;index.js&lt;/b&gt;&lt;br&gt;ReactDOM.render" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="550" y="230" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="f-app" value="&lt;b&gt;App.js&lt;/b&gt;&lt;br&gt;useState, fetch" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="660" y="230" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="f-output" value="&lt;b&gt;OUTPUT:&lt;/b&gt; build/ (static HTML/JS/CSS ~2 MB)&lt;br&gt;Image: calc-frontend (~45 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="440" y="295" width="320" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="f-flow" value="&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;index.html → index.js → App.js → fetch(&#39;/api/calc&#39;)&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="440" y="345" width="320" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tests-folder" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="850" y="130" width="350" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="tests-title" value="&lt;b&gt;tests/&lt;/b&gt; — pytest + Selenium" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="850" y="135" width="350" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t-dockerfile" value="&lt;b&gt;Dockerfile&lt;/b&gt;&lt;br&gt;Python 3.12 slim" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="870" y="165" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="t-req" value="&lt;b&gt;requirements.txt&lt;/b&gt;&lt;br&gt;pytest, requests,&lt;br&gt;selenium" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="980" y="165" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="t-conftest" value="&lt;b&gt;conftest.py&lt;/b&gt;&lt;br&gt;fixtures:&lt;br&gt;wait_for_services&lt;br&gt;browser" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="870" y="220" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t-config" value="&lt;b&gt;test_config.py&lt;/b&gt;&lt;br&gt;BACKEND_URL&lt;br&gt;FRONTEND_URL&lt;br&gt;SELENIUM_HUB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="980" y="220" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="t-api" value="&lt;b&gt;test_api.py&lt;/b&gt;&lt;br&gt;Smoke, API tests&lt;br&gt;(requests)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="870" y="290" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="t-ui" value="&lt;b&gt;test_ui_selenium&lt;/b&gt;&lt;br&gt;UI tests&lt;br&gt;(Selenium)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="980" y="290" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="t-output" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;OUTPUT: test-reports/report.html&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="870" y="360" width="230" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="compose-section" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="40" y="440" width="580" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="compose-title" value="&lt;b&gt;Docker Compose файлы&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="40" y="445" width="580" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-main" value="&lt;b&gt;docker-compose.yml&lt;/b&gt;&lt;br&gt;&lt;br&gt;backend + frontend&lt;br&gt;Основное приложение" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="60" y="475" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-test" value="&lt;b&gt;docker-compose.test.yml&lt;/b&gt;&lt;br&gt;&lt;br&gt;+ tests контейнер&lt;br&gt;API тесты" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="240" y="475" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-selenium" value="&lt;b&gt;docker-compose.selenium.yml&lt;/b&gt;&lt;br&gt;&lt;br&gt;+ Selenium Grid&lt;br&gt;UI тесты" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="420" y="475" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="dc-usage" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;docker compose up&lt;br&gt;docker compose -f docker-compose.test.yml up&lt;br&gt;docker compose -f docker-compose.selenium.yml up&lt;/b&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=10;fontFamily=Courier New;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="60" y="560" width="400" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="docs-section" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="650" y="440" width="550" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="docs-title" value="&lt;b&gt;Документация и CI/CD&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" parent="1" vertex="1">
+          <mxGeometry x="650" y="445" width="550" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="readme" value="&lt;b&gt;README.md&lt;/b&gt;&lt;br&gt;Быстрый старт&lt;br&gt;API Reference" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="670" y="475" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lesson" value="&lt;b&gt;LESSON.md&lt;/b&gt;&lt;br&gt;План урока&lt;br&gt;для преподавателя" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="780" y="475" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="glossary" value="&lt;b&gt;GLOSSARY.md&lt;/b&gt;&lt;br&gt;Словарь терминов&lt;br&gt;50+ определений" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="890" y="475" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gitignore" value="&lt;b&gt;.gitignore&lt;/b&gt;&lt;br&gt;Исключения Git" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="1000" y="475" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="github" value="&lt;b&gt;.github/workflows/test.yml&lt;/b&gt;&lt;br&gt;GitHub Actions CI/CD&lt;br&gt;Автоматические тесты при push" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="670" y="550" width="250" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="conn1" style="endArrow=classic;html=1;strokeWidth=1;dashed=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" parent="1" source="root" target="backend-folder" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn2" style="endArrow=classic;html=1;strokeWidth=1;dashed=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" parent="1" source="root" target="frontend-folder" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn3" style="endArrow=classic;html=1;strokeWidth=1;dashed=1;exitX=0.5;exitY=1;entryX=0.25;entryY=0;" parent="1" source="root" target="tests-folder" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

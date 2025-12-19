@@ -1,0 +1,149 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="22.1.0" type="device">
+  <diagram name="01 - Общая архитектура Docker" id="docker-architecture">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 1: Общая архитектура Docker&lt;/h1&gt;&lt;p&gt;Как Docker изолирует приложения и управляет ими&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="600" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Хост-машина -->
+        <mxCell id="host" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="1200" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="host-label" value="&lt;b&gt;ТВОЙ КОМПЬЮТЕР (HOST)&lt;/b&gt;&lt;br&gt;Физическая машина: Mac / Windows / Linux" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="105" width="1200" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker Engine -->
+        <mxCell id="docker-engine" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="180" width="1120" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="docker-engine-label" value="&lt;b&gt;DOCKER ENGINE&lt;/b&gt;&lt;br&gt;Движок Docker: управляет контейнерами, образами, сетями" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="140" y="185" width="1120" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker Daemon -->
+        <mxCell id="daemon" value="&lt;b&gt;Docker Daemon&lt;/b&gt;&lt;br&gt;(dockerd)&lt;br&gt;&lt;br&gt;Фоновая служба,&lt;br&gt;которая всегда работает&lt;br&gt;и выполняет команды" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="180" y="240" width="160" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker CLI -->
+        <mxCell id="cli" value="&lt;b&gt;Docker CLI&lt;/b&gt;&lt;br&gt;&lt;br&gt;docker build&lt;br&gt;docker run&lt;br&gt;docker ps&lt;br&gt;docker stop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="180" y="380" width="160" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Стрелка CLI -> Daemon -->
+        <mxCell id="cli-daemon-arrow" value="REST API" style="endArrow=classic;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="cli" target="daemon">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Images хранилище -->
+        <mxCell id="images-store" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="400" y="240" width="300" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="images-label" value="&lt;b&gt;IMAGES (Образы)&lt;/b&gt;&lt;br&gt;Шаблоны для контейнеров" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="245" width="300" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Отдельные образы -->
+        <mxCell id="img1" value="calc-backend:local&lt;br&gt;(290 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="420" y="290" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="img2" value="calc-frontend:local&lt;br&gt;(45 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="560" y="290" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="img3" value="nginx:alpine&lt;br&gt;(25 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="420" y="360" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="img4" value="python:3.12-slim&lt;br&gt;(150 MB)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="560" y="360" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Containers -->
+        <mxCell id="containers-area" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="750" y="240" width="470" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="containers-label" value="&lt;b&gt;CONTAINERS (Контейнеры)&lt;/b&gt;&lt;br&gt;Запущенные экземпляры образов — изолированные процессы" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="750" y="245" width="470" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Container 1 -->
+        <mxCell id="cont1" value="&lt;b&gt;calc-backend&lt;/b&gt;&lt;br&gt;├── Java JRE 17&lt;br&gt;├── Spring Boot&lt;br&gt;├── app.jar&lt;br&gt;└── Port 8080" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="780" y="300" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Container 2 -->
+        <mxCell id="cont2" value="&lt;b&gt;calc-frontend&lt;/b&gt;&lt;br&gt;├── nginx&lt;br&gt;├── React build&lt;br&gt;├── nginx.conf&lt;br&gt;└── Port 80" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="940" y="300" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Container 3 -->
+        <mxCell id="cont3" value="&lt;b&gt;calc-tests&lt;/b&gt;&lt;br&gt;├── Python 3.12&lt;br&gt;├── pytest&lt;br&gt;├── selenium&lt;br&gt;└── тесты" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="300" width="100" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Network -->
+        <mxCell id="network" value="&lt;b&gt;Docker Network: calc-net&lt;/b&gt;&lt;br&gt;Виртуальная сеть с DNS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="780" y="420" width="420" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Network connections -->
+        <mxCell id="net1" style="endArrow=none;html=1;exitX=0.5;exitY=1;entryX=0.2;entryY=0;dashed=1;" edge="1" parent="1" source="cont1" target="network">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="net2" style="endArrow=none;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;dashed=1;" edge="1" parent="1" source="cont2" target="network">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="net3" style="endArrow=none;html=1;exitX=0.5;exitY=1;entryX=0.8;entryY=0;dashed=1;" edge="1" parent="1" source="cont3" target="network">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker Hub -->
+        <mxCell id="hub" value="&lt;b&gt;Docker Hub&lt;/b&gt;&lt;br&gt;(Интернет)&lt;br&gt;&lt;br&gt;Публичное хранилище&lt;br&gt;образов" style="ellipse;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="480" y="520" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Pull/Push arrows -->
+        <mxCell id="pull-arrow" value="docker pull" style="endArrow=classic;html=1;entryX=0.5;entryY=1;exitX=0.5;exitY=0;" edge="1" parent="1" source="hub" target="images-store">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Легенда -->
+        <mxCell id="legend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="180" y="520" width="250" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;ЛЕГЕНДА&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="180" y="525" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="Host — твой компьютер" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="190" y="550" width="110" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="Docker Engine" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="310" y="550" width="110" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="Images — шаблоны" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="190" y="585" width="110" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="Containers — процессы" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="310" y="585" width="110" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" value="Daemon — служба" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="190" y="620" width="110" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" value="CLI — командная строка" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="310" y="620" width="110" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Пояснения -->
+        <mxCell id="notes" value="&lt;b&gt;КЛЮЧЕВЫЕ КОНЦЕПЦИИ:&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. &lt;b&gt;Изоляция&lt;/b&gt; — каждый контейнер работает отдельно&lt;br&gt;2. &lt;b&gt;Образ ≠ Контейнер&lt;/b&gt; — образ это шаблон, контейнер это процесс&lt;br&gt;3. &lt;b&gt;Один образ → много контейнеров&lt;/b&gt;&lt;br&gt;4. &lt;b&gt;Docker сеть&lt;/b&gt; — контейнеры общаются по именам" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;spacingLeft=10;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="500" width="450" height="120" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

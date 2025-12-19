@@ -1,0 +1,173 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="07 - Структура React приложения" id="react-structure">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 7: Структура React приложения&lt;/h1&gt;&lt;p&gt;От исходного кода до работающего UI&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="300" y="10" width="600" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Source files -->
+        <mxCell id="source" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="280" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="source-title" value="&lt;b&gt;ИСХОДНЫЙ КОД&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="85" width="280" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- File tree -->
+        <mxCell id="tree" value="frontend/&lt;br&gt;├── public/&lt;br&gt;│   └── &lt;b&gt;index.html&lt;/b&gt;&lt;br&gt;├── src/&lt;br&gt;│   ├── &lt;b&gt;index.js&lt;/b&gt;&lt;br&gt;│   └── &lt;b&gt;App.js&lt;/b&gt;&lt;br&gt;├── package.json&lt;br&gt;├── nginx.conf&lt;br&gt;└── Dockerfile" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=15;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="110" width="200" height="150" as="geometry" />
+        </mxCell>
+        
+        <!-- index.html explanation -->
+        <mxCell id="html-exp" value="&lt;b&gt;index.html&lt;/b&gt;&lt;br&gt;&lt;div id=&quot;root&quot;&gt;&lt;/div&gt;&lt;br&gt;↑ React монтируется сюда" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="270" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- index.js explanation -->
+        <mxCell id="js-exp" value="&lt;b&gt;index.js&lt;/b&gt;&lt;br&gt;ReactDOM.render(&lt;br&gt;  &lt;App /&gt;, root)&lt;br&gt;↑ Точка входа" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="180" y="270" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- App.js explanation -->
+        <mxCell id="app-exp" value="&lt;b&gt;App.js&lt;/b&gt; — главный компонент" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="250" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- App.js detailed -->
+        <mxCell id="app-detail" value="&lt;b&gt;App.js&lt;/b&gt; — главный компонент" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="340" width="250" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Build process -->
+        <mxCell id="build-arrow" value="npm run build" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="330" y="255" as="sourcePoint" />
+            <mxPoint x="410" y="255" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Build output -->
+        <mxCell id="build" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="420" y="80" width="240" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="build-title" value="&lt;b&gt;BUILD OUTPUT&lt;/b&gt;&lt;br&gt;(статические файлы)" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="420" y="85" width="240" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="build-tree" value="build/&lt;br&gt;├── index.html&lt;br&gt;├── static/&lt;br&gt;│   ├── js/&lt;br&gt;│   │   └── main.abc123.js&lt;br&gt;│   └── css/&lt;br&gt;│       └── main.def456.css&lt;br&gt;└── asset-manifest.json" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=15;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="430" y="120" width="220" height="140" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="build-note" value="• JSX → JavaScript&lt;br&gt;• Минификация (сжатие)&lt;br&gt;• Хеш в имени (кеширование)&lt;br&gt;• Один бандл со всем кодом" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=10;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="430" y="270" width="200" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Размер -->
+        <mxCell id="size" value="~20 MB исходники&lt;br&gt;→ ~2 MB build" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="430" y="360" width="210" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- App.js component structure -->
+        <mxCell id="component" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="80" width="350" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="component-title" value="&lt;b&gt;App.js — СТРУКТУРА КОМПОНЕНТА&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="700" y="85" width="350" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- State -->
+        <mxCell id="state" value="&lt;b&gt;STATE (Состояние)&lt;/b&gt;&lt;br&gt;&lt;br&gt;const [a, setA] = useState('')&lt;br&gt;const [b, setB] = useState('')&lt;br&gt;const [op, setOp] = useState('+')&lt;br&gt;const [result, setResult] = useState(null)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=10;fontFamily=Courier New;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="720" y="115" width="310" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Function -->
+        <mxCell id="func" value="&lt;b&gt;ФУНКЦИЯ calculate()&lt;/b&gt;&lt;br&gt;&lt;br&gt;const calculate = async () =&gt; {&lt;br&gt;  const resp = await fetch('/api/calc',&lt;br&gt;    { method: 'POST', body: JSON.stringify({a,b,op}) }&lt;br&gt;  );&lt;br&gt;  const data = await resp.json();&lt;br&gt;  setResult(data.result);&lt;br&gt;}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=10;fontFamily=Courier New;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="720" y="205" width="310" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- JSX -->
+        <mxCell id="jsx" value="&lt;b&gt;JSX (Разметка)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&amp;lt;input value={a} onChange={...}/&amp;gt;&lt;br&gt;&amp;lt;select value={op}&amp;gt;...&amp;lt;/select&amp;gt;&lt;br&gt;&amp;lt;button onClick={calculate}&amp;gt;&lt;br&gt;{result &amp;&amp; &amp;lt;div&amp;gt;Результат: {result}&amp;lt;/div&amp;gt;}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;fontFamily=Courier New;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="720" y="315" width="310" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Data flow -->
+        <mxCell id="flow-title" value="&lt;b&gt;ПОТОК ДАННЫХ В REACT&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="450" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="1010" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="f1" value="1. User Input&lt;br&gt;onChange" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="60" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="fa1" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="170" y="525" as="sourcePoint" />
+            <mxPoint x="220" y="525" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="f2" value="2. setState&lt;br&gt;setA('10')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="230" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="fa2" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="340" y="525" as="sourcePoint" />
+            <mxPoint x="390" y="525" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="f3" value="3. Re-render&lt;br&gt;App()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="400" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="fa3" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="510" y="525" as="sourcePoint" />
+            <mxPoint x="560" y="525" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="f4" value="4. Virtual DOM&lt;br&gt;Diff" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="570" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="fa4" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="680" y="525" as="sourcePoint" />
+            <mxPoint x="730" y="525" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="f5" value="5. DOM Update&lt;br&gt;(только изменения)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="740" y="500" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="fa5" style="endArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="870" y="525" as="sourcePoint" />
+            <mxPoint x="920" y="525" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="f6" value="6. User видит&lt;br&gt;обновление" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="930" y="500" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flow-note" value="React обновляет DOM только там, где изменения — это эффективно!" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="570" width="500" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

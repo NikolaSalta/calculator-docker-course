@@ -1,0 +1,165 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="06 - Путь HTTP запроса" id="http-request-flow">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 6: Путь HTTP запроса через систему&lt;/h1&gt;&lt;p&gt;От клика в браузере до ответа от backend&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="700" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Browser -->
+        <mxCell id="browser" value="&lt;b&gt;БРАУЗЕР&lt;/b&gt;&lt;br&gt;&lt;br&gt;Пользователь нажал&lt;br&gt;&quot;Вычислить&quot;&lt;br&gt;&lt;br&gt;fetch('/api/calc')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="120" width="150" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 1 -->
+        <mxCell id="step1" value="&lt;b&gt;1&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="210" y="160" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow1" value="POST http://localhost:3000/api/calc" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#0e8088;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="180" as="sourcePoint" />
+            <mxPoint x="300" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Host ports -->
+        <mxCell id="host-port" value="&lt;b&gt;HOST PORT&lt;/b&gt;&lt;br&gt;:3000&lt;br&gt;&lt;br&gt;-p 3000:80" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="310" y="120" width="100" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 2 -->
+        <mxCell id="step2" value="&lt;b&gt;2&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="420" y="160" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow2" value="→ порт 80 контейнера" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#d6b656;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="180" as="sourcePoint" />
+            <mxPoint x="500" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Frontend container -->
+        <mxCell id="frontend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="510" y="80" width="250" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-title" value="&lt;b&gt;FRONTEND CONTAINER&lt;/b&gt;&lt;br&gt;calc-frontend" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="510" y="85" width="250" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- nginx -->
+        <mxCell id="nginx" value="&lt;b&gt;nginx&lt;/b&gt;&lt;br&gt;:80&lt;br&gt;&lt;br&gt;location /api/&lt;br&gt;proxy_pass&lt;br&gt;http://backend:8080" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="530" y="120" width="110" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- React files -->
+        <mxCell id="react" value="&lt;b&gt;React&lt;/b&gt;&lt;br&gt;(статика)&lt;br&gt;&lt;br&gt;index.html&lt;br&gt;main.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="650" y="120" width="90" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- nginx sees /api -->
+        <mxCell id="nginx-logic" value="nginx видит /api/ →&lt;br&gt;не отдаёт файл,&lt;br&gt;а проксирует запрос!" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=center;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="230" width="210" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 3 -->
+        <mxCell id="step3" value="&lt;b&gt;3&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="770" y="160" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3" value="proxy_pass" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#6c8ebf;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="760" y="180" as="sourcePoint" />
+            <mxPoint x="870" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Docker DNS -->
+        <mxCell id="dns" value="&lt;b&gt;Docker DNS&lt;/b&gt;&lt;br&gt;backend →&lt;br&gt;172.18.0.2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="785" y="80" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Backend container -->
+        <mxCell id="backend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="880" y="80" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-title" value="&lt;b&gt;BACKEND CONTAINER&lt;/b&gt;&lt;br&gt;calc-backend" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="880" y="85" width="200" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Spring Boot -->
+        <mxCell id="spring" value="&lt;b&gt;Spring Boot&lt;/b&gt;&lt;br&gt;:8080&lt;br&gt;&lt;br&gt;@PostMapping&lt;br&gt;/api/calc" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="905" y="120" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Step 4 -->
+        <mxCell id="step4" value="&lt;b&gt;4&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="940" y="210" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="calc-logic" value="Java вычисляет:&lt;br&gt;10 * 5 = 50" style="text;html=1;strokeColor=none;fillColor=#d5e8d4;align=center;rounded=1;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="905" y="245" width="150" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Response path -->
+        <mxCell id="resp-title" value="&lt;b&gt;ПУТЬ ОТВЕТА (5→8)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="350" y="320" width="700" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Response box -->
+        <mxCell id="response" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="50" y="350" width="1030" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="r1" value="&lt;b&gt;5.&lt;/b&gt; Backend&lt;br&gt;формирует JSON&lt;br&gt;{result: 50}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="70" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="r-arrow1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="200" y="390" as="sourcePoint" />
+            <mxPoint x="260" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="r2" value="&lt;b&gt;6.&lt;/b&gt; nginx&lt;br&gt;получает ответ&lt;br&gt;от proxy" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="270" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="r-arrow2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="390" as="sourcePoint" />
+            <mxPoint x="460" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="r3" value="&lt;b&gt;7.&lt;/b&gt; Port mapping&lt;br&gt;80 → 3000" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="470" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="r-arrow3" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="390" as="sourcePoint" />
+            <mxPoint x="660" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="r4" value="&lt;b&gt;8.&lt;/b&gt; Браузер&lt;br&gt;показывает&lt;br&gt;&quot;Результат: 50&quot;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="670" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Timing -->
+        <mxCell id="timing" value="&lt;b&gt;⏱ Всё за ~100-200ms!&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="830" y="365" width="230" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Key insight -->
+        <mxCell id="insight" value="&lt;b&gt;КЛЮЧЕВОЙ МОМЕНТ:&lt;/b&gt;&lt;br&gt;Браузер отправляет запрос на localhost:3000&lt;br&gt;Он НЕ ЗНАЕТ про backend!&lt;br&gt;nginx делает всю &quot;магию&quot; проксирования" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="140" width="200" height="100" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

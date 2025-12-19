@@ -1,0 +1,188 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="02 - Жизненный цикл Image и Container" id="lifecycle">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 2: Жизненный цикл Image и Container&lt;/h1&gt;&lt;p&gt;От исходного кода до работающего приложения&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- SECTION 1: Создание образа -->
+        <mxCell id="section1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="450" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="section1-title" value="&lt;b&gt;ЭТАП 1: СОЗДАНИЕ ОБРАЗА (BUILD)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="105" width="450" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Исходный код -->
+        <mxCell id="source" value="&lt;b&gt;Исходный код&lt;/b&gt;&lt;br&gt;&lt;br&gt;├── src/&lt;br&gt;├── pom.xml&lt;br&gt;└── Dockerfile" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="150" width="130" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Dockerfile -->
+        <mxCell id="dockerfile" value="&lt;b&gt;Dockerfile&lt;/b&gt;&lt;br&gt;&lt;br&gt;FROM maven...&lt;br&gt;COPY . .&lt;br&gt;RUN mvn build&lt;br&gt;CMD [&quot;java&quot;...]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="80" y="280" width="130" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker build -->
+        <mxCell id="build-cmd" value="&lt;b&gt;docker build&lt;/b&gt;&lt;br&gt;-t name:tag ." style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="260" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Layers -->
+        <mxCell id="layers" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="260" y="290" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="layer-title" value="&lt;b&gt;СЛОИ (Layers)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="260" y="293" width="120" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1" value="Layer 4: CMD" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="270" y="310" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2" value="Layer 3: RUN build" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="270" y="335" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3" value="Layer 2: COPY" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="270" y="360" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4" value="Layer 1: FROM" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="270" y="385" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Стрелки build -->
+        <mxCell id="arr1" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="source" target="build-cmd">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr2" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="dockerfile" target="layers">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr3" style="endArrow=classic;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="build-cmd" target="layers">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Image result -->
+        <mxCell id="image-result" value="&lt;b&gt;IMAGE&lt;/b&gt;&lt;br&gt;calc-backend:local&lt;br&gt;(Неизменяемый)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="410" y="200" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="arr4" style="endArrow=classic;html=1;exitX=1;exitY=0;entryX=0;entryY=0.5;" edge="1" parent="1" source="layers" target="image-result">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- SECTION 2: Жизненный цикл контейнера -->
+        <mxCell id="section2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="550" y="100" width="700" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="section2-title" value="&lt;b&gt;ЭТАП 2: ЖИЗНЕННЫЙ ЦИКЛ КОНТЕЙНЕРА&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="550" y="105" width="700" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- States -->
+        <mxCell id="created" value="&lt;b&gt;CREATED&lt;/b&gt;&lt;br&gt;Создан" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="600" y="180" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="running" value="&lt;b&gt;RUNNING&lt;/b&gt;&lt;br&gt;Работает" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="780" y="180" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="paused" value="&lt;b&gt;PAUSED&lt;/b&gt;&lt;br&gt;Приостановлен" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="780" y="280" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="stopped" value="&lt;b&gt;STOPPED&lt;/b&gt;&lt;br&gt;Остановлен" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="960" y="180" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="removed" value="&lt;b&gt;REMOVED&lt;/b&gt;&lt;br&gt;Удалён" style="ellipse;whiteSpace=wrap;html=1;fillColor=#666666;strokeColor=#333333;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="180" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Transitions -->
+        <mxCell id="t1" value="docker create" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="image-result" target="created">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="t2" value="docker start" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="created" target="running">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="t3" value="docker pause" style="endArrow=classic;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="running" target="paused">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="t4" value="docker unpause" style="endArrow=classic;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;dashed=1;" edge="1" parent="1" source="paused" target="running">
+          <mxGeometry x="-0.2" width="50" height="50" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="t5" value="docker stop" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="running" target="stopped">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="t6" value="docker rm" style="endArrow=classic;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="stopped" target="removed">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="t7" value="docker restart" style="endArrow=classic;html=1;exitX=0;exitY=1;entryX=1;entryY=1;curved=1;" edge="1" parent="1" source="stopped" target="running">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="920" y="280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- docker run shortcut -->
+        <mxCell id="run-shortcut" value="&lt;b&gt;docker run&lt;/b&gt;&lt;br&gt;= create + start" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="280" width="80" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="t8" style="endArrow=classic;html=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;dashed=1;" edge="1" parent="1" source="run-shortcut" target="running">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Примечания -->
+        <mxCell id="notes1" value="&lt;b&gt;ВАЖНО:&lt;/b&gt;&lt;br&gt;• Image — неизменяемый (read-only)&lt;br&gt;• Container добавляет writable layer&lt;br&gt;• При удалении контейнера данные теряются&lt;br&gt;• Для сохранения используй volumes" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;spacingLeft=10;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="360" width="280" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="notes2" value="&lt;b&gt;СЛОИ (Layers):&lt;/b&gt;&lt;br&gt;• Каждая инструкция Dockerfile = слой&lt;br&gt;• Слои кешируются&lt;br&gt;• Повторная сборка использует кеш&lt;br&gt;• Изменился файл → пересборка слоя и выше" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;spacingLeft=10;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="360" width="280" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- SECTION 3: Команды -->
+        <mxCell id="section3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="50" y="480" width="1200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="section3-title" value="&lt;b&gt;КОМАНДЫ НА КАЖДОМ ЭТАПЕ&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="485" width="1200" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Commands table -->
+        <mxCell id="cmd1" value="&lt;b&gt;IMAGES&lt;/b&gt;&lt;br&gt;docker images&lt;br&gt;docker build -t name .&lt;br&gt;docker rmi name&lt;br&gt;docker pull name&lt;br&gt;docker push name" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cmd2" value="&lt;b&gt;CONTAINERS&lt;/b&gt;&lt;br&gt;docker ps / docker ps -a&lt;br&gt;docker run -d --name X&lt;br&gt;docker stop X&lt;br&gt;docker start X&lt;br&gt;docker rm X" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="290" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cmd3" value="&lt;b&gt;INSPECT&lt;/b&gt;&lt;br&gt;docker logs X&lt;br&gt;docker logs -f X&lt;br&gt;docker exec -it X sh&lt;br&gt;docker inspect X&lt;br&gt;docker port X" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cmd4" value="&lt;b&gt;NETWORKS&lt;/b&gt;&lt;br&gt;docker network ls&lt;br&gt;docker network create X&lt;br&gt;docker network rm X&lt;br&gt;docker network inspect X&lt;br&gt;--network X (в run)" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="710" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cmd5" value="&lt;b&gt;CLEANUP&lt;/b&gt;&lt;br&gt;docker system df&lt;br&gt;docker system prune&lt;br&gt;docker container prune&lt;br&gt;docker image prune&lt;br&gt;docker volume prune" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="920" y="520" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

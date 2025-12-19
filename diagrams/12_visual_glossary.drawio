@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="12 - Визуальный глоссарий Docker" id="glossary">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 12: Визуальный глоссарий Docker&lt;/h1&gt;&lt;p&gt;Все ключевые термины и их связи&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="600" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker ecosystem -->
+        <mxCell id="ecosystem" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="1400" height="400" as="geometry" />
+        </mxCell>
+        <mxCell id="eco-title" value="&lt;b&gt;ЭКОСИСТЕМА DOCKER&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="85" width="1400" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Dockerfile -->
+        <mxCell id="dockerfile" value="&lt;b&gt;Dockerfile&lt;/b&gt;&lt;br&gt;&lt;br&gt;Текстовый файл с&lt;br&gt;инструкциями для&lt;br&gt;создания образа&lt;br&gt;&lt;br&gt;&lt;i&gt;📄 Рецепт&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="140" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Image -->
+        <mxCell id="image" value="&lt;b&gt;Image (Образ)&lt;/b&gt;&lt;br&gt;&lt;br&gt;Неизменяемый шаблон&lt;br&gt;со всеми зависимостями&lt;br&gt;&lt;br&gt;&lt;i&gt;📦 Коробка с игрой&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="300" y="130" width="150" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Container -->
+        <mxCell id="container" value="&lt;b&gt;Container&lt;/b&gt;&lt;br&gt;&lt;br&gt;Запущенный экземпляр&lt;br&gt;образа, изолированный&lt;br&gt;процесс&lt;br&gt;&lt;br&gt;&lt;i&gt;🎮 Запущенная игра&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="530" y="130" width="150" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Network -->
+        <mxCell id="network" value="&lt;b&gt;Network&lt;/b&gt;&lt;br&gt;&lt;br&gt;Виртуальная сеть&lt;br&gt;для связи контейнеров&lt;br&gt;&lt;br&gt;&lt;i&gt;🌐 Домофон в доме&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="760" y="130" width="140" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Volume -->
+        <mxCell id="volume" value="&lt;b&gt;Volume&lt;/b&gt;&lt;br&gt;&lt;br&gt;Постоянное хранилище&lt;br&gt;данных контейнера&lt;br&gt;&lt;br&gt;&lt;i&gt;💾 Флешка&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="980" y="130" width="140" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Registry -->
+        <mxCell id="registry" value="&lt;b&gt;Registry&lt;/b&gt;&lt;br&gt;(Docker Hub)&lt;br&gt;&lt;br&gt;Хранилище образов&lt;br&gt;в интернете&lt;br&gt;&lt;br&gt;&lt;i&gt;🏪 Магазин игр&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="130" width="140" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows between main concepts -->
+        <mxCell id="arr1" value="docker build" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#82b366;" edge="1" parent="1" source="dockerfile" target="image">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arr2" value="docker run" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#d79b00;" edge="1" parent="1" source="image" target="container">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arr3" value="--network" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#6c8ebf;dashed=1;" edge="1" parent="1" source="container" target="network">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arr4" value="-v" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#9673a6;dashed=1;" edge="1" parent="1" source="container" target="volume">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arr5" value="docker pull/push" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#0e8088;" edge="1" parent="1" source="image" target="registry">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="375" y="100" />
+              <mxPoint x="1270" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Dockerfile instructions -->
+        <mxCell id="df-section" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="280" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="df-title" value="&lt;b&gt;Инструкции Dockerfile&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="285" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="from" value="&lt;b&gt;FROM&lt;/b&gt; — базовый образ" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="90" y="310" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="workdir" value="&lt;b&gt;WORKDIR&lt;/b&gt; — директория" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="310" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="copy" value="&lt;b&gt;COPY&lt;/b&gt; — копировать файлы" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="90" y="345" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="run" value="&lt;b&gt;RUN&lt;/b&gt; — выполнить команду" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="345" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="expose" value="&lt;b&gt;EXPOSE&lt;/b&gt; — порт (документация)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="90" y="380" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd" value="&lt;b&gt;CMD&lt;/b&gt; — команда запуска" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="380" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="env" value="&lt;b&gt;ENV&lt;/b&gt; — переменная среды" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="90" y="415" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="arg" value="&lt;b&gt;ARG&lt;/b&gt; — аргумент сборки" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="230" y="415" width="130" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker run flags -->
+        <mxCell id="flags-section" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="420" y="280" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="flags-title" value="&lt;b&gt;Флаги docker run&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="420" y="285" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="d-flag" value="&lt;b&gt;-d&lt;/b&gt; — detach (фоновый режим)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="430" y="310" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="p-flag" value="&lt;b&gt;-p&lt;/b&gt; — port (проброс порта)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="575" y="310" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="name-flag" value="&lt;b&gt;--name&lt;/b&gt; — имя контейнера" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="430" y="345" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="net-flag" value="&lt;b&gt;--network&lt;/b&gt; — сеть" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="575" y="345" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="v-flag" value="&lt;b&gt;-v&lt;/b&gt; — volume (том)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="430" y="380" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="e-flag" value="&lt;b&gt;-e&lt;/b&gt; — env (переменная)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="575" y="380" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="it-flag" value="&lt;b&gt;-it&lt;/b&gt; — interactive + tty" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="430" y="415" width="135" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="rm-flag" value="&lt;b&gt;--rm&lt;/b&gt; — удалить после" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="575" y="415" width="135" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Commands -->
+        <mxCell id="cmd-section" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="760" y="280" width="360" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-title" value="&lt;b&gt;Основные команды&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="760" y="285" width="360" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cmd-build" value="docker build -t name ." style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="770" y="310" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-run" value="docker run -d --name X" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="945" y="310" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-ps" value="docker ps" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="770" y="345" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-logs" value="docker logs -f X" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="945" y="345" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-exec" value="docker exec -it X sh" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="770" y="380" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-stop" value="docker stop X" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="945" y="380" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-rm" value="docker rm X" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="770" y="415" width="165" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-compose" value="docker compose up" style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;fontFamily=Courier New;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="945" y="415" width="165" height="25" as="geometry" />
+        </mxCell>
+        
+        <!-- Port mapping explanation -->
+        <mxCell id="port-section" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="450" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="port-title" value="&lt;b&gt;Port Mapping (Проброс портов)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="515" width="450" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-host" value="&lt;b&gt;HOST&lt;/b&gt;&lt;br&gt;localhost:3000" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-arrow" value="-p 3000:80" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="170" y="575" as="sourcePoint" />
+            <mxPoint x="270" y="575" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="port-container" value="&lt;b&gt;CONTAINER&lt;/b&gt;&lt;br&gt;nginx:80" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="280" y="550" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="port-note" value="Запрос на localhost:3000&lt;br&gt;направляется в контейнер на порт 80" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="610" width="320" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- DNS explanation -->
+        <mxCell id="dns-section" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="520" y="510" width="450" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="dns-title" value="&lt;b&gt;Docker DNS&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="520" y="515" width="450" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="dns-cont1" value="&lt;b&gt;frontend&lt;/b&gt;&lt;br&gt;172.18.0.3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="540" y="550" width="90" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="dns-arrow" value="http://backend:8080" style="endArrow=classic;html=1;strokeWidth=2;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="640" y="575" as="sourcePoint" />
+            <mxPoint x="760" y="575" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="dns-cont2" value="&lt;b&gt;backend&lt;/b&gt;&lt;br&gt;172.18.0.2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="770" y="550" width="90" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="dns-note" value="Контейнеры в одной сети находят&lt;br&gt;друг друга по имени (Docker DNS)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="610" width="320" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Compose -->
+        <mxCell id="compose-section" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="510" width="440" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="compose-title" value="&lt;b&gt;Docker Compose&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="515" width="440" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="compose-yaml" value="services:&lt;br&gt;  backend:&lt;br&gt;    build: ./backend&lt;br&gt;  frontend:&lt;br&gt;    depends_on: [backend]" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Courier New;fontSize=10;align=left;spacingLeft=10;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="545" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="compose-benefits" value="✅ Одна команда вместо многих&lt;br&gt;✅ Автоматическая сеть&lt;br&gt;✅ Порядок запуска&lt;br&gt;✅ Все настройки в файле" style="text;html=1;strokeColor=none;fillColor=none;align=left;spacingLeft=10;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="545" width="200" height="80" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

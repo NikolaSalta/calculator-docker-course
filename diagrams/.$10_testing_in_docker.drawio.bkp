@@ -1,0 +1,160 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="10 - Тестирование в Docker" id="testing">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Заголовок -->
+        <mxCell id="title" value="&lt;h1&gt;ДИАГРАММА 10: Тестирование в Docker&lt;/h1&gt;&lt;p&gt;API-тесты и Selenium UI-тесты&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="500" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Docker network -->
+        <mxCell id="network" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="1100" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="network-title" value="&lt;b&gt;Docker Network: test-network&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="85" width="1100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Backend -->
+        <mxCell id="backend" value="&lt;b&gt;backend&lt;/b&gt;&lt;br&gt;&lt;br&gt;Spring Boot&lt;br&gt;:8080&lt;br&gt;&lt;br&gt;/api/calc&lt;br&gt;/api/health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="120" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend -->
+        <mxCell id="frontend" value="&lt;b&gt;frontend&lt;/b&gt;&lt;br&gt;&lt;br&gt;nginx + React&lt;br&gt;:80&lt;br&gt;&lt;br&gt;UI калькулятора" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="280" width="120" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Tests container -->
+        <mxCell id="tests" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="280" y="120" width="350" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="tests-title" value="&lt;b&gt;tests (pytest контейнер)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="280" y="125" width="350" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- conftest.py -->
+        <mxCell id="conftest" value="&lt;b&gt;conftest.py&lt;/b&gt;&lt;br&gt;&lt;br&gt;wait_for_services()&lt;br&gt;Ждёт готовности backend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="155" width="140" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- test_api.py -->
+        <mxCell id="test-api" value="&lt;b&gt;test_api.py&lt;/b&gt;&lt;br&gt;&lt;br&gt;TestSmoke&lt;br&gt;- test_backend_health&lt;br&gt;- test_frontend_available&lt;br&gt;&lt;br&gt;TestCalculatorAPI&lt;br&gt;- test_operations&lt;br&gt;- test_division_by_zero" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="300" y="225" width="140" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- test_ui_selenium.py -->
+        <mxCell id="test-ui" value="&lt;b&gt;test_ui_selenium.py&lt;/b&gt;&lt;br&gt;&lt;br&gt;CalculatorPage (Page Object)&lt;br&gt;&lt;br&gt;TestCalculatorUI&lt;br&gt;- test_page_loads&lt;br&gt;- test_addition&lt;br&gt;- test_multiplication" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="460" y="155" width="150" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- browser fixture -->
+        <mxCell id="browser-fix" value="&lt;b&gt;browser fixture&lt;/b&gt;&lt;br&gt;WebDriver.Remote(&lt;br&gt;  selenium-hub:4444)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="460" y="285" width="150" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Selenium Grid -->
+        <mxCell id="selenium" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="120" width="400" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="selenium-title" value="&lt;b&gt;Selenium Grid&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="700" y="125" width="400" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Hub -->
+        <mxCell id="hub" value="&lt;b&gt;selenium-hub&lt;/b&gt;&lt;br&gt;:4444&lt;br&gt;&lt;br&gt;Координатор&lt;br&gt;Принимает запросы&lt;br&gt;Распределяет по нодам" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="730" y="155" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Chrome node -->
+        <mxCell id="chrome" value="&lt;b&gt;selenium-chrome&lt;/b&gt;&lt;br&gt;&lt;br&gt;Chrome браузер&lt;br&gt;(headless)&lt;br&gt;&lt;br&gt;Реально открывает&lt;br&gt;страницы, кликает" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="730" y="275" width="140" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- Grid UI -->
+        <mxCell id="grid-ui" value="&lt;b&gt;Grid UI&lt;/b&gt;&lt;br&gt;http://localhost:4444&lt;br&gt;&lt;br&gt;Мониторинг сессий&lt;br&gt;в реальном времени" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="920" y="155" width="140" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows -->
+        <mxCell id="arr1" value="HTTP requests" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#d79b00;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="300" y="270" as="sourcePoint" />
+            <mxPoint x="200" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arr2" value="HTTP" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#6c8ebf;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="300" y="320" as="sourcePoint" />
+            <mxPoint x="200" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arr3" value="WebDriver" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#0e8088;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="610" y="260" as="sourcePoint" />
+            <mxPoint x="730" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arr4" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#0e8088;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="800" y="255" as="sourcePoint" />
+            <mxPoint x="800" y="275" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arr5" value="Chrome открывает http://frontend:80" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#6c8ebf;curved=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="730" y="350" as="sourcePoint" />
+            <mxPoint x="200" y="350" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Test types -->
+        <mxCell id="types" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="1100" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="types-title" value="&lt;b&gt;ТИПЫ ТЕСТОВ И КОГДА ИХ ИСПОЛЬЗОВАТЬ&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;" vertex="1" parent="1">
+          <mxGeometry x="40" y="465" width="1100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Smoke -->
+        <mxCell id="smoke" value="&lt;b&gt;🔥 SMOKE TESTS&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Быстрые (секунды)&lt;br&gt;• Базовая проверка&lt;br&gt;• &quot;Оно вообще работает?&quot;&lt;br&gt;&lt;br&gt;pytest -m smoke" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="495" width="160" height="130" as="geometry" />
+        </mxCell>
+        
+        <!-- API -->
+        <mxCell id="api-tests" value="&lt;b&gt;🔌 API TESTS&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Средние (секунды)&lt;br&gt;• Проверка логики&lt;br&gt;• Без браузера&lt;br&gt;&lt;br&gt;pytest -m api" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="240" y="495" width="160" height="130" as="geometry" />
+        </mxCell>
+        
+        <!-- UI -->
+        <mxCell id="ui-tests" value="&lt;b&gt;🖥️ UI TESTS&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Медленные (минуты)&lt;br&gt;• Реальный браузер&lt;br&gt;• End-to-end&lt;br&gt;&lt;br&gt;pytest -m ui_selenium" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="420" y="495" width="160" height="130" as="geometry" />
+        </mxCell>
+        
+        <!-- Pyramid -->
+        <mxCell id="pyramid" value="" style="triangle;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;rotation=-180;" vertex="1" parent="1">
+          <mxGeometry x="620" y="495" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="pyr-label" value="&lt;b&gt;Пирамида тестирования&lt;/b&gt;&lt;br&gt;&lt;br&gt;UI (мало)&lt;br&gt;↓&lt;br&gt;API (больше)&lt;br&gt;↓&lt;br&gt;Unit (много)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="620" y="500" width="200" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Commands -->
+        <mxCell id="commands" value="&lt;b&gt;КОМАНДЫ ЗАПУСКА&lt;/b&gt;&lt;br&gt;&lt;br&gt;# API тесты&lt;br&gt;docker compose -f docker-compose.test.yml up --build&lt;br&gt;&lt;br&gt;# Selenium тесты&lt;br&gt;docker compose -f docker-compose.selenium.yml up --build&lt;br&gt;&lt;br&gt;# Отчёт&lt;br&gt;open ./test-reports/report.html" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=10;fontFamily=Courier New;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="860" y="495" width="260" height="130" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
