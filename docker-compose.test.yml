@@ -1,0 +1,114 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# docker-compose.test.yml — Compose файл для запуска API-тестов
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Этот файл добавляет тестовый контейнер к основному приложению.
+# Тесты запускаются ПОСЛЕ того, как приложение готово.
+#
+# Использование:
+#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+#
+# Флаг --abort-on-container-exit:
+#   Останавливает все контейнеры, когда тесты завершаются.
+#   Без него приложение продолжит работать после окончания тестов.
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # BACKEND (идентичен основному compose)
+  # ─────────────────────────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: calc-backend-test
+    
+    # healthcheck важен для тестов!
+    # Тесты должны дождаться, пока backend будет готов
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
+      interval: 5s        # Проверять каждые 5 секунд (чаще для тестов)
+      timeout: 3s
+      retries: 10         # Больше попыток для медленного старта
+      start_period: 30s   # Начальный период: не считать неудачи первые 30 сек
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # FRONTEND
+  # ─────────────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.compose
+    container_name: calc-frontend-test
+    depends_on:
+      backend:
+        # condition: service_healthy — ждать пока backend станет healthy
+        # Это РЕАЛЬНОЕ ожидание готовности, не просто порядок запуска
+        condition: service_healthy
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # TESTS — контейнер с тестами
+  # ─────────────────────────────────────────────────────────────────────────
+  tests:
+    # build: ./tests — собрать образ из Dockerfile в папке tests
+    build: ./tests
+    container_name: calc-tests
+    
+    # environment — переменные окружения для тестов
+    # Тесты используют эти переменные для подключения к сервисам
+    environment:
+      # URL backend-сервиса (имя сервиса в compose)
+      - BACKEND_URL=http://backend:8080
+      
+      # URL frontend-сервиса
+      - FRONTEND_URL=http://frontend:80
+      
+      # Сколько секунд ждать готовности сервисов
+      - STARTUP_WAIT=60
+    
+    # depends_on — тесты запускаются после готовности приложения
+    depends_on:
+      backend:
+        condition: service_healthy   # Ждём пока backend станет healthy
+      frontend:
+        condition: service_started   # Frontend достаточно просто запустить
+    
+    # volumes — подключение директорий хоста к контейнеру
+    # Формат: "путь_на_хосте:путь_в_контейнере"
+    #
+    # ./test-reports — папка на твоём компьютере
+    # /tests/reports — папка внутри контейнера
+    #
+    # pytest сохранит HTML-отчёт в /tests/reports/report.html
+    # Благодаря volume, файл появится в ./test-reports/report.html на хосте
+    volumes:
+      - ./test-reports:/tests/reports
+    
+    # command — переопределение CMD из Dockerfile
+    # Запускаем только smoke и api тесты (без Selenium)
+    # -v — verbose (подробный вывод)
+    # -m "smoke or api" — только тесты с маркерами smoke или api
+    # --html=... — генерировать HTML-отчёт
+    # --self-contained-html — CSS и JS встроены в HTML (один файл)
+    command: [
+      "-v",
+      "-m", "smoke or api",
+      "--html=/tests/reports/report.html",
+      "--self-contained-html"
+    ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ИСПОЛЬЗОВАНИЕ
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Запустить тесты:
+#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+#
+# Только smoke-тесты:
+#   docker compose -f docker-compose.test.yml run --rm tests pytest -m smoke
+#
+# Посмотреть отчёт:
+#   open ./test-reports/report.html
+# ═══════════════════════════════════════════════════════════════════════════

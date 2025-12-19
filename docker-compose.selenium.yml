@@ -1,0 +1,193 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# docker-compose.selenium.yml — Compose для полных тестов с Selenium
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Этот файл включает:
+# - Backend и Frontend (как обычно)
+# - Selenium Grid Hub (координатор браузеров)
+# - Chrome Node (браузер Chrome в контейнере)
+# - Tests (тесты с Selenium WebDriver)
+#
+# Selenium Grid — это система для запуска браузеров:
+# - Hub (хаб) — принимает запросы и распределяет по нодам
+# - Node (нода) — содержит браузер (Chrome, Firefox)
+#
+# Использование:
+#   docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
+#
+# Selenium Grid UI:
+#   http://localhost:4444
+# ═══════════════════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # BACKEND
+  # ─────────────────────────────────────────────────────────────────────────
+  backend:
+    build: ./backend
+    container_name: calc-backend-selenium
+    # Подключаем к явно созданной сети
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # FRONTEND
+  # ─────────────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.compose
+    container_name: calc-frontend-selenium
+    networks:
+      - test-network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # SELENIUM HUB — координатор браузеров
+  # ─────────────────────────────────────────────────────────────────────────
+  #
+  # Hub принимает запросы от WebDriver и направляет их на ноды.
+  # Можно подключить много нод для параллельного тестирования.
+  # ─────────────────────────────────────────────────────────────────────────
+  selenium-hub:
+    # Официальный образ Selenium Hub
+    image: selenium/hub:4.17.0
+    container_name: selenium-hub
+    networks:
+      - test-network
+    # Порты Selenium Grid:
+    # 4442 — EventBus publish (внутренний)
+    # 4443 — EventBus subscribe (внутренний)
+    # 4444 — WebDriver HTTP (для тестов и UI)
+    ports:
+      - "4444:4444"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # CHROME NODE — браузер Chrome
+  # ─────────────────────────────────────────────────────────────────────────
+  #
+  # Это контейнер с настоящим браузером Chrome.
+  # Selenium тесты управляют им через WebDriver протокол.
+  # ─────────────────────────────────────────────────────────────────────────
+  chrome:
+    # Официальный образ Chrome для Selenium
+    image: selenium/node-chrome:4.17.0
+    container_name: selenium-chrome
+    
+    # shm_size — размер /dev/shm (shared memory)
+    # Chrome интенсивно использует shared memory
+    # По умолчанию Docker даёт 64MB — это мало для Chrome
+    # 2GB обычно достаточно для нормальной работы
+    shm_size: 2gb
+    
+    networks:
+      - test-network
+    
+    # Chrome нода должна подключиться к Hub
+    depends_on:
+      - selenium-hub
+    
+    # Переменные окружения для подключения к Hub
+    environment:
+      # Адрес Hub для Event Bus
+      - SE_EVENT_BUS_HOST=selenium-hub
+      
+      # Порт для публикации событий
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      
+      # Порт для подписки на события
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      
+      # Максимальное количество параллельных сессий
+      # 4 = можно запустить 4 теста одновременно в одной ноде
+      - SE_NODE_MAX_SESSIONS=4
+      
+      # Разрешить превышать дефолтный лимит сессий
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # TESTS — контейнер с тестами
+  # ─────────────────────────────────────────────────────────────────────────
+  tests:
+    build: ./tests
+    container_name: calc-tests-selenium
+    networks:
+      - test-network
+    
+    environment:
+      # URL сервисов
+      - BACKEND_URL=http://backend:8080
+      - FRONTEND_URL=http://frontend:80
+      
+      # URL Selenium Hub для WebDriver
+      # Тесты будут подключаться к Hub, а Hub направит запросы в Chrome
+      - SELENIUM_HUB_URL=http://selenium-hub:4444
+      
+      # Какой браузер использовать
+      - BROWSER=chrome
+      
+      # Увеличенное время ожидания (Selenium дольше запускается)
+      - STARTUP_WAIT=90
+    
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_started
+      # Ждём пока Chrome нода подключится к Hub
+      chrome:
+        condition: service_started
+    
+    volumes:
+      - ./test-reports:/tests/reports
+    
+    # Запускаем ВСЕ тесты (включая Selenium UI тесты)
+    # Без -m фильтра — все тесты
+    command: [
+      "-v",
+      "--html=/tests/reports/report.html",
+      "--self-contained-html"
+    ]
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NETWORKS — явное определение сети
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Создаём свою сеть вместо автоматической.
+# Все сервисы с "networks: - test-network" будут в этой сети.
+# ═══════════════════════════════════════════════════════════════════════════
+networks:
+  test-network:
+    # driver: bridge — стандартный драйвер для локальных сетей
+    # Контейнеры в bridge-сети могут общаться по именам
+    driver: bridge
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ИСПОЛЬЗОВАНИЕ
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Запустить полные тесты:
+#   docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
+#
+# Только UI тесты:
+#   docker compose -f docker-compose.selenium.yml run --rm tests pytest -m ui_selenium
+#
+# Selenium Grid UI (пока тесты идут):
+#   open http://localhost:4444
+#
+# Посмотреть отчёт:
+#   open ./test-reports/report.html
+# ═══════════════════════════════════════════════════════════════════════════

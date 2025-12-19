@@ -1,2 +1,230 @@
-# calculator-docker-course
-docker-course
+# 🐳 Docker Calculator — Учебный проект
+
+Полнофункциональное приложение-калькулятор для изучения Docker.
+
+## 📋 Описание
+
+Этот проект создан для обучения Docker на практике. Включает:
+- **Backend**: Java Spring Boot REST API
+- **Frontend**: React SPA + nginx
+- **Tests**: pytest + Selenium
+
+## 🎯 Чему вы научитесь
+
+- Собирать Docker-образы из Dockerfile
+- Запускать контейнеры и настраивать сети
+- Пробрасывать порты между хостом и контейнером
+- Использовать Docker Compose для оркестрации
+- Заходить внутрь контейнеров для отладки
+- Запускать автотесты в Docker
+
+## 🚀 Быстрый старт
+
+### Требования
+- Docker Desktop (Mac/Windows) или Docker Engine (Linux)
+- Git
+
+### Запуск приложения
+
+```bash
+# Клонировать репозиторий
+git clone https://github.com/[your-org]/calculator.git
+cd calculator
+
+# Запустить через Docker Compose
+docker compose up --build -d
+
+# Открыть в браузере
+open http://localhost:3000
+```
+
+### Остановка
+
+```bash
+docker compose down
+```
+
+## 📁 Структура проекта
+
+```
+calculator/
+├── backend/                 # Java Spring Boot приложение
+│   ├── Dockerfile          # Инструкция сборки backend
+│   ├── pom.xml             # Maven конфигурация
+│   └── src/                # Исходный код
+│
+├── frontend/               # React приложение
+│   ├── Dockerfile          # Инструкция сборки (manual)
+│   ├── Dockerfile.compose  # Инструкция сборки (compose)
+│   ├── nginx.conf          # Конфиг nginx (manual)
+│   ├── nginx.compose.conf  # Конфиг nginx (compose)
+│   ├── package.json        # Node.js зависимости
+│   └── src/                # Исходный код React
+│
+├── tests/                  # Автотесты (pytest + Selenium)
+│   ├── Dockerfile          # Образ с тестами
+│   ├── requirements.txt    # Python зависимости
+│   ├── conftest.py         # Общие fixtures
+│   ├── test_api.py         # API-тесты
+│   └── test_ui_selenium.py # UI-тесты
+│
+├── docker-compose.yml          # Основной compose
+├── docker-compose.test.yml     # Compose с API-тестами
+└── docker-compose.selenium.yml # Compose с Selenium-тестами
+```
+
+## 🔧 Режимы запуска
+
+### 1. Manual режим (для обучения)
+
+```bash
+# Создать сеть
+docker network create calc-net
+
+# Собрать образы
+docker build -t calc-backend:local ./backend
+docker build -t calc-frontend:local ./frontend
+
+# Запустить backend
+docker run -d --name calc-backend \
+  --network calc-net \
+  -p 8080:8080 \
+  calc-backend:local
+
+# Запустить frontend
+docker run -d --name calc-frontend \
+  --network calc-net \
+  -p 3000:80 \
+  calc-frontend:local
+
+# Проверить
+docker ps
+curl http://localhost:8080/api/health
+open http://localhost:3000
+```
+
+### 2. Docker Compose (рекомендуется)
+
+```bash
+docker compose up --build -d
+```
+
+### 3. С тестами
+
+```bash
+# API-тесты
+docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+
+# Selenium UI-тесты
+docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
+
+# Отчёт
+open ./test-reports/report.html
+```
+
+## 🌐 Endpoints
+
+| URL | Описание |
+|-----|----------|
+| http://localhost:3000 | UI калькулятора |
+| http://localhost:8080/api/health | Health check |
+| http://localhost:8080/api/calc | API вычислений |
+| http://localhost:4444 | Selenium Grid UI (при запуске тестов) |
+
+## 📚 API Reference
+
+### POST /api/calc
+
+Выполнить вычисление.
+
+**Request:**
+```json
+{
+  "a": 10,
+  "b": 5,
+  "op": "+"
+}
+```
+
+**Response:**
+```json
+{
+  "result": 15.0,
+  "operation": "10.0 + 5.0"
+}
+```
+
+**Операции:** `+`, `-`, `*`, `/`
+
+### GET /api/health
+
+Проверка состояния сервиса.
+
+**Response:**
+```json
+{
+  "status": "OK",
+  "service": "calc-backend"
+}
+```
+
+## 🧪 Тестирование
+
+### Запуск всех тестов
+```bash
+docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
+```
+
+### Только smoke-тесты
+```bash
+docker compose -f docker-compose.test.yml run --rm tests pytest -m smoke
+```
+
+### Только API-тесты
+```bash
+docker compose -f docker-compose.test.yml run --rm tests pytest -m api
+```
+
+### Только UI-тесты
+```bash
+docker compose -f docker-compose.selenium.yml run --rm tests pytest -m ui_selenium
+```
+
+## 🐛 Отладка
+
+### Посмотреть логи
+```bash
+docker compose logs -f
+docker compose logs backend
+docker compose logs frontend
+```
+
+### Зайти внутрь контейнера
+```bash
+docker exec -it calc-backend sh
+docker exec -it calc-frontend sh
+```
+
+### Проверить сеть
+```bash
+docker network ls
+docker inspect calc-backend --format '{{json .NetworkSettings.Networks}}'
+```
+
+## 📖 Полезные команды
+
+```bash
+# Список образов
+docker images | grep calc-
+
+# Список контейнеров
+docker ps -a
+
+# Очистка
+docker compose down
+docker system prune -a  # ОСТОРОЖНО: удалит всё неиспользуемое
+```
+
+## 📝 Лицензия
+
+MIT License - используйте для обучения свободно!
