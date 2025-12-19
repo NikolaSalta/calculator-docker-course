@@ -58,6 +58,7 @@ htmlcov/
 test-reports/
 *.html
 !frontend/public/index.html
+!documents/*.html
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Docker (не игнорируем Dockerfile и compose файлы!)
