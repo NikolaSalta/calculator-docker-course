@@ -39,9 +39,9 @@
 
 | Образ | Ссылка |
 |-------|--------|
-| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=amd64) |
-| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=amd64) |
-| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64) |
+| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend |
+| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend |
+| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests |
 
 ### Вариант 1: Запуск из готовых образов (быстро!)
 

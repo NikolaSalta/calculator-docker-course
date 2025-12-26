@@ -695,8 +695,6 @@ docker compose -f docker-compose.reports.yml up -d
 | `latest` | Последняя версия (multi-arch) | [nikolaysaltan/calculator-docker-tests:latest](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests) |
 | `v2.0-chromium` | Версия 2.0 с Chromium | [nikolaysaltan/calculator-docker-tests:v2.0-chromium](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=v2.0) |
 | `v2.0-multiarch` | Multi-platform (AMD64 + ARM64) | [nikolaysaltan/calculator-docker-tests:v2.0-multiarch](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=multiarch) |
-| `amd64` | x86_64 (Windows/Linux) | [nikolaysaltan/calculator-docker-tests:amd64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64) |
-| `arm64` | Apple Silicon (M1/M2/M3) | [nikolaysaltan/calculator-docker-tests:arm64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=arm64) |
 
 ```bash
 # Скачать образ (автоматически выберет нужную архитектуру)
