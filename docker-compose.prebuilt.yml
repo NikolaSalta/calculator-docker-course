@@ -1,39 +1,41 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# docker-compose.yml — Основной файл Docker Compose
+# docker-compose.prebuilt.yml — Запуск из готовых образов
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# УЛУЧШЕНИЯ:
-# - Убрана устаревшая директива version
-# - Добавлен depends_on с condition: service_healthy
-# - Изменён порт frontend на 3001 (избежание конфликта с Grafana)
-# - Добавлены ограничения ресурсов
+# Этот файл использует ГОТОВЫЕ образы из Docker Hub или GitHub CR.
+# Не требует сборки — просто скачивает и запускает.
+#
+# Использование:
+#   docker compose -f docker-compose.prebuilt.yml up -d
+#
+# Для использования своих образов измените переменные:
+#   export DOCKER_USERNAME=your-username
+#   docker compose -f docker-compose.prebuilt.yml up -d
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# SERVICES — определение сервисов (контейнеров)
-# ═══════════════════════════════════════════════════════════════════════════
 services:
 
   # ─────────────────────────────────────────────────────────────────────────
   # BACKEND SERVICE
   # ─────────────────────────────────────────────────────────────────────────
   backend:
-    build: ./backend
+    # Используем готовый образ вместо сборки
+    # Замените 'your-username' на ваш username Docker Hub
+    image: ${DOCKER_USERNAME:-your-username}/calculator-docker-backend:latest
+    
     container_name: calc-backend
     
     ports:
       - "8080:8080"
     
-    # Healthcheck для проверки готовности сервиса
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 30s  # Даём время на запуск Spring Boot
+      start_period: 30s
     
-    # Ограничения ресурсов (защита от утечек памяти)
     deploy:
       resources:
         limits:
@@ -41,52 +43,49 @@ services:
         reservations:
           memory: 256M
     
-    # Переменные окружения
-    environment:
-      - JAVA_OPTS=-Xmx384m -Xms128m
+    restart: unless-stopped
 
 
   # ─────────────────────────────────────────────────────────────────────────
   # FRONTEND SERVICE
   # ─────────────────────────────────────────────────────────────────────────
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.compose
+    # Используем готовый образ вместо сборки
+    image: ${DOCKER_USERNAME:-your-username}/calculator-docker-frontend:latest
     
     container_name: calc-frontend
     
-    # ИСПРАВЛЕНИЕ: Порт 3001 вместо 3000 (конфликт с Grafana)
     ports:
       - "3001:80"
     
-    # УЛУЧШЕНИЕ: Ждём пока backend станет healthy
     depends_on:
       backend:
         condition: service_healthy
     
-    # Ограничения ресурсов для nginx
     deploy:
       resources:
         limits:
           memory: 128M
         reservations:
           memory: 64M
+    
+    restart: unless-stopped
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ИСПОЛЬЗОВАНИЕ
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Запустить всё:
-#   docker compose up --build -d
+# 1. Установите username:
+#    export DOCKER_USERNAME=nikolay  # замените на свой
 #
-# Посмотреть статус:
-#   docker compose ps
+# 2. Запустите:
+#    docker compose -f docker-compose.prebuilt.yml up -d
 #
-# Посмотреть логи:
-#   docker compose logs -f
+# 3. Откройте:
+#    http://localhost:3001
 #
-# Остановить и удалить:
-#   docker compose down
+# 4. Остановите:
+#    docker compose -f docker-compose.prebuilt.yml down
 # ═══════════════════════════════════════════════════════════════════════════
+

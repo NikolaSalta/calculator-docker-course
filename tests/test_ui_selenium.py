@@ -227,39 +227,28 @@ class CalculatorPage:
         Нажать кнопку "Вычислить" и дождаться результата.
         
         Используем explicit wait вместо time.sleep() для надёжности:
-        - Ждём пока результат появится или изменится
+        - Ждём пока кнопка снова станет активной (запрос завершён)
+        - Ждём появления результата или ошибки
         - Не тратим время на ожидание, если ответ пришёл быстро
-        - Корректно обрабатываем медленные ответы
         """
-        # Запоминаем текущий результат (если есть)
-        old_result = self._get_result_text()
-        
         # Кликаем кнопку
-        self.driver.find_element(By.CSS_SELECTOR, "button").click()
+        button = self.driver.find_element(By.CSS_SELECTOR, "button")
+        button.click()
         
-        # Ждём появления/изменения результата (вместо time.sleep)
-        # Условие: текст результата изменился ИЛИ появился новый
+        # Ждём пока кнопка станет активной снова (индикатор завершения запроса)
         self.wait.until(
-            lambda d: self._get_result_text() != old_result
-                      or "Результат" in d.page_source
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "button"))
+        )
+        
+        # Дополнительная проверка: ждём появления результата или ошибки
+        self.wait.until(
+            lambda d: (
+                len(d.find_elements(By.XPATH, "//*[contains(text(), 'Результат')]")) > 0 or
+                len(d.find_elements(By.XPATH, "//*[contains(text(), 'Ошибка')]")) > 0
+            )
         )
         
         return self
-    
-    def _get_result_text(self):
-        """
-        Получить текущий текст результата или пустую строку.
-        
-        Вспомогательный метод для explicit wait.
-        """
-        try:
-            elements = self.driver.find_elements(
-                By.XPATH,
-                "//*[contains(text(), 'Результат')]"
-            )
-            return elements[0].text if elements else ""
-        except Exception:
-            return ""
     
     def get_result(self):
         """

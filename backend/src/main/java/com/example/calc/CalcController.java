@@ -20,6 +20,9 @@ package com.example.calc;
 
 // Импорты Spring Web
 import org.springframework.web.bind.annotation.*;
+// Логирование
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Map — структура данных "ключ-значение" (как словарь)
 import java.util.Map;
@@ -31,128 +34,120 @@ import java.util.Map;
  * 
  * 2. @ResponseBody — возвращаемое значение методов автоматически
  *    преобразуется в JSON и отправляется клиенту
- * 
- * Без @ResponseBody пришлось бы вручную создавать ResponseEntity
- * и сериализовать объекты в JSON.
  */
 @RestController
-
-/*
- * @RequestMapping("/api") — базовый путь для всех эндпоинтов класса
- * 
- * Все методы этого контроллера будут начинаться с /api:
- * - /api/calc
- * - /api/health
- */
 @RequestMapping("/api")
 
 /*
- * @CrossOrigin(origins = "*") — разрешить запросы с любого домена
+ * @CrossOrigin — настройка CORS (Cross-Origin Resource Sharing)
  * 
- * Что такое CORS?
- * Cross-Origin Resource Sharing — политика безопасности браузера.
- * По умолчанию браузер запрещает JavaScript делать запросы
- * на другой домен/порт (cross-origin).
+ * БЕЗОПАСНОСТЬ: Используем конфигурируемый список origins из application.properties
+ * вместо "*" (все домены). В продакшене укажите конкретные домены.
  * 
- * Пример: страница на localhost:3000 не может запросить localhost:8080
- * 
- * @CrossOrigin говорит серверу добавить заголовок:
- * Access-Control-Allow-Origin: *
- * 
- * Это разрешает браузеру делать запросы с любого источника.
- * В продакшене лучше указать конкретные домены вместо "*".
- * 
- * Примечание: в нашем проекте nginx проксирует запросы,
- * поэтому CORS не нужен. Но мы добавляем на всякий случай
- * для тестирования напрямую через localhost:8080.
+ * ${cors.allowed-origins:http://localhost:3000} означает:
+ * - Взять значение из property cors.allowed-origins
+ * - Если не найдено, использовать http://localhost:3000 по умолчанию
  */
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${cors.allowed-origins:http://localhost:3000}")
 public class CalcController {
+    
+    /*
+     * Logger — для записи логов
+     * 
+     * Уровни логирования:
+     * - TRACE: самый детальный
+     * - DEBUG: для отладки
+     * - INFO: информационные сообщения
+     * - WARN: предупреждения
+     * - ERROR: ошибки
+     */
+    private static final Logger logger = LoggerFactory.getLogger(CalcController.class);
     
     /*
      * ═══════════════════════════════════════════════════════════════════════
      * POST /api/calc — выполнить вычисление
      * ═══════════════════════════════════════════════════════════════════════
-     * 
-     * @PostMapping("/calc") — обрабатывать POST-запросы на /api/calc
-     * 
-     * Почему POST, а не GET?
-     * - GET для получения данных (без изменений на сервере)
-     * - POST для отправки данных (создание, вычисление)
-     * 
-     * Хотя калькулятор не изменяет состояние, мы используем POST,
-     * потому что отправляем данные в теле запроса (JSON).
      */
     @PostMapping("/calc")
-    public Map<String, Object> calculate(
-        /*
-         * @RequestBody — взять тело HTTP-запроса и преобразовать в объект
-         * 
-         * Клиент отправляет JSON:
-         * {"a": 10, "b": 5, "op": "+"}
-         * 
-         * Spring автоматически (через Jackson) преобразует его в Map:
-         * Map содержит: "a" -> 10, "b" -> 5, "op" -> "+"
-         * 
-         * Map<String, Object> — карта со строковыми ключами
-         * и значениями любого типа (числа, строки)
-         */
-        @RequestBody Map<String, Object> request
-    ) {
-        /*
-         * Извлекаем значения из Map
-         * 
-         * request.get("a") возвращает Object
-         * (Number) — приводим к типу Number (общий тип для Integer, Double)
-         * .doubleValue() — получаем double
-         */
-        double a = ((Number) request.get("a")).doubleValue();
-        double b = ((Number) request.get("b")).doubleValue();
-        String op = (String) request.get("op");
+    public Map<String, Object> calculate(@RequestBody Map<String, Object> request) {
+        
+        logger.debug("Получен запрос: {}", request);
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // ВАЛИДАЦИЯ ВХОДНЫХ ДАННЫХ
+        // ═══════════════════════════════════════════════════════════════════
         
         /*
-         * Вычисляем результат
-         * 
-         * switch expression (Java 14+) — современный синтаксис switch
-         * Вместо:
-         *   switch (op) {
-         *     case "+": result = a + b; break;
-         *     ...
-         *   }
-         * 
-         * Пишем компактно:
-         *   double result = switch (op) {
-         *     case "+" -> a + b;
-         *     ...
-         *   };
-         * 
-         * -> вместо : и не нужен break
+         * Проверяем наличие обязательных полей
+         * Без этой проверки request.get("a") вернёт null
+         * и вызовет NullPointerException
+         */
+        if (!request.containsKey("a") || !request.containsKey("b") || !request.containsKey("op")) {
+            logger.warn("Отсутствуют обязательные поля в запросе: {}", request);
+            throw new IllegalArgumentException("Missing required fields: a, b, op");
+        }
+        
+        Object aObj = request.get("a");
+        Object bObj = request.get("b");
+        Object opObj = request.get("op");
+        
+        /*
+         * Проверяем типы данных
+         * Клиент может отправить строку "abc" вместо числа
+         */
+        if (!(aObj instanceof Number)) {
+            logger.warn("Поле 'a' не является числом: {}", aObj);
+            throw new IllegalArgumentException("Field 'a' must be a number");
+        }
+        if (!(bObj instanceof Number)) {
+            logger.warn("Поле 'b' не является числом: {}", bObj);
+            throw new IllegalArgumentException("Field 'b' must be a number");
+        }
+        if (!(opObj instanceof String)) {
+            logger.warn("Поле 'op' не является строкой: {}", opObj);
+            throw new IllegalArgumentException("Field 'op' must be a string");
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════
+        // ИЗВЛЕЧЕНИЕ И ВЫЧИСЛЕНИЕ
+        // ═══════════════════════════════════════════════════════════════════
+        
+        double a = ((Number) aObj).doubleValue();
+        double b = ((Number) bObj).doubleValue();
+        String op = (String) opObj;
+        
+        logger.info("Вычисление: {} {} {}", a, op, b);
+        
+        /*
+         * Вычисляем результат с улучшенной обработкой ошибок
          */
         double result = switch (op) {
-            case "+" -> a + b;      // Сложение
-            case "-" -> a - b;      // Вычитание
-            case "*" -> a * b;      // Умножение
-            case "/" -> b != 0      // Деление (с проверкой на ноль)
-                ? a / b 
-                : Double.NaN;       // NaN = Not a Number (результат деления на 0)
-            /*
-             * default — если op не совпадает ни с одним case
-             * Бросаем исключение с понятным сообщением
-             */
-            default -> throw new IllegalArgumentException("Unknown operation: " + op);
+            case "+" -> a + b;
+            case "-" -> a - b;
+            case "*" -> a * b;
+            case "/" -> {
+                /*
+                 * ИСПРАВЛЕНИЕ: Деление на ноль теперь бросает исключение
+                 * вместо возврата NaN. Это позволяет клиенту получить
+                 * понятное сообщение об ошибке.
+                 */
+                if (b == 0) {
+                    logger.warn("Попытка деления на ноль: {} / {}", a, b);
+                    throw new IllegalArgumentException("Division by zero");
+                }
+                yield a / b;
+            }
+            default -> {
+                logger.warn("Неизвестная операция: {}", op);
+                throw new IllegalArgumentException("Unknown operation: " + op);
+            }
         };
         
-        /*
-         * Возвращаем результат
-         * 
-         * Map.of() — создаёт неизменяемую карту (Java 9+)
-         * 
-         * Spring автоматически преобразует Map в JSON:
-         * {"result": 15.0, "operation": "10.0 + 5.0"}
-         */
+        logger.info("Результат: {} {} {} = {}", a, op, b, result);
+        
         return Map.of(
-            "result", result,                           // Числовой результат
-            "operation", a + " " + op + " " + b         // Текстовое описание
+            "result", result,
+            "operation", a + " " + op + " " + b
         );
     }
     
@@ -160,32 +155,12 @@ public class CalcController {
      * ═══════════════════════════════════════════════════════════════════════
      * GET /api/health — проверка здоровья сервиса
      * ═══════════════════════════════════════════════════════════════════════
-     * 
-     * @GetMapping("/health") — обрабатывать GET-запросы на /api/health
-     * 
-     * Health check (проверка здоровья) — стандартный паттерн:
-     * - Мониторинг вызывает этот эндпоинт
-     * - Если ответ 200 OK — сервис жив
-     * - Если таймаут или ошибка — сервис упал
-     * 
-     * Используется в:
-     * - Docker healthcheck
-     * - Kubernetes liveness/readiness probes
-     * - Load balancer health checks
      */
     @GetMapping("/health")
     public Map<String, String> health() {
-        /*
-         * Возвращаем простой JSON с информацией о сервисе
-         * 
-         * В реальном приложении здесь можно проверять:
-         * - Соединение с базой данных
-         * - Доступность внешних сервисов
-         * - Наличие свободной памяти
-         */
         return Map.of(
-            "status", "OK",                 // Статус сервиса
-            "service", "calc-backend"       // Имя сервиса (для логов)
+            "status", "OK",
+            "service", "calc-backend"
         );
     }
 }
