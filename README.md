@@ -249,6 +249,18 @@ docker compose -f docker-compose.reports.yml up -d
 docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
 ```
 
+### Сборка тест-образа под конкретную архитектуру (2 Dockerfile)
+
+```bash
+# ARM64 (Apple Silicon) — tests/Dockerfile.arm64
+docker buildx build --platform linux/arm64 -f tests/Dockerfile.arm64 \
+  -t nikolaysaltan/calculator-docker-tests:arm64 --push ./tests
+
+# AMD64/x86_64 (Windows/Linux) — tests/Dockerfile.amd64
+docker buildx build --platform linux/amd64 -f tests/Dockerfile.amd64 \
+  -t nikolaysaltan/calculator-docker-tests:amd64 --push ./tests
+```
+
 ### Только smoke-тесты
 ```bash
 docker compose -f docker-compose.test.yml run --rm tests pytest -m smoke

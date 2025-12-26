@@ -746,6 +746,22 @@ docker build -t nikolaysaltan/calculator-docker-tests:v2.0 ./tests
 docker push nikolaysaltan/calculator-docker-tests:v2.0
 ```
 
+### 9.5.1 ДВА ОТДЕЛЬНЫХ Dockerfile (ARM64 и AMD64)
+
+Если вам нужно **2 отдельных Dockerfile**, используйте:
+- `tests/Dockerfile.arm64` — под Apple Silicon / ARM64 (база как “в начале”: `python:3.12-slim`)
+- `tests/Dockerfile.amd64` — под x86_64 / Windows (Debian Bookworm: `python:3.12-slim-bookworm`)
+
+```bash
+# ARM64 (Mac M1/M2/M3)
+docker buildx build --platform linux/arm64 -f tests/Dockerfile.arm64 \
+  -t nikolaysaltan/calculator-docker-tests:arm64 --push ./tests
+
+# AMD64 / x86_64 (Windows/Linux)
+docker buildx build --platform linux/amd64 -f tests/Dockerfile.amd64 \
+  -t nikolaysaltan/calculator-docker-tests:amd64 --push ./tests
+```
+
 ### 9.6 Dockerfile
 
 ```dockerfile
