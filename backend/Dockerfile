@@ -55,18 +55,25 @@ RUN mvn clean package -DskipTests
 # поэтому используем стандартную версию
 FROM eclipse-temurin:17-jre
 
+# Создаем пользователя appuser для запуска приложения без прав root
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
 # Снова устанавливаем рабочую директорию
 WORKDIR /app
 
 # COPY --from=builder — копируем файл из предыдущего этапа
 # /app/target/*.jar — скомпилированный JAR из этапа builder
 # app.jar — имя файла в текущем образе
-COPY --from=builder /app/target/*.jar app.jar
+# Меняем владельца файла на appuser
+COPY --from=builder --chown=appuser:appuser /app/target/*.jar app.jar
 
 # EXPOSE — документирует порт, который использует приложение
 # Это НЕ открывает порт! Только документация.
 # Реальный проброс порта делается через -p при docker run
 EXPOSE 8080
+
+# Переключаемся на пользователя appuser
+USER appuser
 
 # CMD — команда, которая выполнится при запуске контейнера
 # Формат JSON-массива: ["исполняемый файл", "аргумент1", "аргумент2"]

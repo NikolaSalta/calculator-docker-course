@@ -57,18 +57,31 @@ RUN npm run build
 # nginx:alpine — веб-сервер nginx на Alpine Linux (~25MB)
 FROM nginx:alpine
 
+# Создаем pid файл и даем права пользователю nginx
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d
+
 # Копируем собранные файлы React из этапа builder
 # /app/build (из builder) → /usr/share/nginx/html (в nginx)
 # Это стандартная директория для статических файлов в nginx
 COPY --from=builder /app/build /usr/share/nginx/html
+
+# Меняем владельца файлов на nginx
+RUN chown -R nginx:nginx /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 # nginx.conf содержит настройки проксирования /api в backend
 # /etc/nginx/conf.d/default.conf — путь к конфигу сайта по умолчанию
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Документируем порт 80 (стандартный HTTP-порт nginx)
-EXPOSE 80
+# Документируем порт 8080 (стандартный HTTP-порт nginx)
+EXPOSE 8080
+
+# Переключаемся на пользователя nginx
+USER nginx
 
 # Запускаем nginx
 # daemon off — запустить на переднем плане (не демонизировать)
