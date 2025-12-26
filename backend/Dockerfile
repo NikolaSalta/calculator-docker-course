@@ -22,7 +22,7 @@
 # - Maven 3.9 (инструмент сборки Java)
 # - Eclipse Temurin JDK 17 (Java Development Kit)
 # AS builder — имя этапа, на него можно ссылаться позже
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # WORKDIR — установить рабочую директорию
 # Все последующие команды выполняются в этой папке
@@ -53,7 +53,10 @@ RUN mvn clean package -DskipTests
 # eclipse-temurin:17-jre — JRE 17 (поддерживает ARM и x86)
 # Примечание: alpine-версия не поддерживает Apple Silicon (ARM),
 # поэтому используем стандартную версию
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17.0.10_7-jre
+
+# Создаем пользователя appuser для запуска приложения без прав root
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 # Снова устанавливаем рабочую директорию
 WORKDIR /app
@@ -61,12 +64,16 @@ WORKDIR /app
 # COPY --from=builder — копируем файл из предыдущего этапа
 # /app/target/*.jar — скомпилированный JAR из этапа builder
 # app.jar — имя файла в текущем образе
-COPY --from=builder /app/target/*.jar app.jar
+# Меняем владельца файла на appuser
+COPY --from=builder --chown=appuser:appuser /app/target/*.jar app.jar
 
 # EXPOSE — документирует порт, который использует приложение
 # Это НЕ открывает порт! Только документация.
 # Реальный проброс порта делается через -p при docker run
 EXPOSE 8080
+
+# Переключаемся на пользователя appuser
+USER appuser
 
 # CMD — команда, которая выполнится при запуске контейнера
 # Формат JSON-массива: ["исполняемый файл", "аргумент1", "аргумент2"]

@@ -20,7 +20,7 @@
 
 # node:20-alpine — Node.js 20 на минимальном Alpine Linux
 # Alpine делает образ меньше (~150MB вместо ~1GB)
-FROM node:20-alpine AS builder
+FROM node:20.11.1-alpine AS builder
 
 # Рабочая директория внутри контейнера
 WORKDIR /app
@@ -55,20 +55,30 @@ RUN npm run build
 # └─────────────────────────────────────────────────────────────────────────┘
 
 # nginx:alpine — веб-сервер nginx на Alpine Linux (~25MB)
-FROM nginx:alpine
+FROM nginx:1.25.4-alpine
+
+# Создаем pid файл и даем права пользователю nginx
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /etc/nginx/conf.d
 
 # Копируем собранные файлы React из этапа builder
 # /app/build (из builder) → /usr/share/nginx/html (в nginx)
 # Это стандартная директория для статических файлов в nginx
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder --chown=nginx:nginx /app/build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 # nginx.conf содержит настройки проксирования /api в backend
 # /etc/nginx/conf.d/default.conf — путь к конфигу сайта по умолчанию
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Документируем порт 80 (стандартный HTTP-порт nginx)
-EXPOSE 80
+# Документируем порт 8080 (стандартный HTTP-порт nginx)
+EXPOSE 8080
+
+# Переключаемся на пользователя nginx
+USER nginx
 
 # Запускаем nginx
 # daemon off — запустить на переднем плане (не демонизировать)
