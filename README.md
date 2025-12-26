@@ -37,11 +37,27 @@
 
 ### 📦 Готовые образы на Docker Hub
 
-| Образ | Ссылка |
-|-------|--------|
-| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend |
-| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend |
-| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests |
+#### 🍎 Apple Silicon (ARM64) — Mac M1/M2/M3
+
+| Компонент | Команда скачивания | Ссылка на Docker Hub |
+|-----------|-------------------|---------------------|
+| **Backend** | `docker pull nikolaysaltan/calculator-docker-backend:arm64` | [🔗 Backend ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=arm64) |
+| **Frontend** | `docker pull nikolaysaltan/calculator-docker-frontend:arm64` | [🔗 Frontend ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=arm64) |
+| **Tests** | `docker pull nikolaysaltan/calculator-docker-tests:arm64` | [🔗 Tests ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=arm64) |
+
+#### 💻 x86_64 (AMD64) — Windows, Linux, Intel Mac
+
+| Компонент | Команда скачивания | Ссылка на Docker Hub |
+|-----------|-------------------|---------------------|
+| **Backend** | `docker pull nikolaysaltan/calculator-docker-backend:amd64` | [🔗 Backend AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=amd64) |
+| **Frontend** | `docker pull nikolaysaltan/calculator-docker-frontend:amd64` | [🔗 Frontend AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=amd64) |
+| **Tests** | `docker pull nikolaysaltan/calculator-docker-tests:amd64` | [🔗 Tests AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64) |
+
+#### 📋 Общие ссылки на репозитории
+
+- **Backend**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend
+- **Frontend**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend
+- **Tests**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests
 
 ### Вариант 1: Запуск из готовых образов (быстро!)
 
