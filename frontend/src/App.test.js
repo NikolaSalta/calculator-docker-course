@@ -197,8 +197,11 @@ describe('Calculator App', () => {
      *
      * mockResolvedValueOnce — вернуть значение один раз
      * (следующий вызов fetch вернёт undefined, если не настроить)
+     * 
+     * ВАЖНО: ok: true необходим для проверки response.ok в App.js
      */
     global.fetch.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ result: 15.0, operation: '10.0 + 5.0' })
     });
 
@@ -226,6 +229,7 @@ describe('Calculator App', () => {
 
   test('отправляет правильный запрос при умножении', async () => {
     global.fetch.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ result: 50.0, operation: '10.0 * 5.0' })
     });
 
@@ -260,6 +264,7 @@ describe('Calculator App', () => {
 
   test('показывает результат после успешного вычисления', async () => {
     global.fetch.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ result: 42.0, operation: '35.0 + 7.0' })
     });
 
@@ -313,7 +318,7 @@ describe('Calculator App', () => {
   // ТЕСТЫ ИНДИКАТОРА ЗАГРУЗКИ
   // ═══════════════════════════════════════════════════════════════════════════
 
-  test('показывает "Считаем..." во время загрузки', async () => {
+  test('показывает "Вычисляю..." во время загрузки', async () => {
     /*
      * Создаём "зависающий" Promise
      * Он никогда не разрешится, что позволяет проверить состояние loading
@@ -332,8 +337,8 @@ describe('Calculator App', () => {
     
     await user.click(screen.getByRole('button', { name: /вычислить/i }));
     
-    // Пока запрос "в полёте", должен показываться текст "Считаем..."
-    expect(screen.getByText(/считаем/i)).toBeInTheDocument();
+    // Пока запрос "в полёте", должен показываться текст "Вычисляю..."
+    expect(screen.getByText(/вычисляю/i)).toBeInTheDocument();
     
     // Разрешаем Promise чтобы тест не завис
     resolvePromise({
@@ -348,6 +353,7 @@ describe('Calculator App', () => {
 
   test('работает с отрицательными числами', async () => {
     global.fetch.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ result: -5.0, operation: '-10.0 + 5.0' })
     });
 
@@ -369,6 +375,7 @@ describe('Calculator App', () => {
 
   test('работает с десятичными числами', async () => {
     global.fetch.mockResolvedValueOnce({
+      ok: true,
       json: () => Promise.resolve({ result: 6.0, operation: '3.5 + 2.5' })
     });
 

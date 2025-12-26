@@ -35,18 +35,38 @@
 - Docker Desktop (Mac/Windows) или Docker Engine (Linux)
 - Git
 
-### Запуск приложения
+### 📦 Готовые образы на Docker Hub
+
+| Образ | Ссылка |
+|-------|--------|
+| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend |
+| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend |
+
+### Вариант 1: Запуск из готовых образов (быстро!)
+
+```bash
+# Скачать compose файл
+curl -O https://raw.githubusercontent.com/nikolasalta/calculator-docker-course/main/docker-compose.prebuilt.yml
+
+# Запустить
+docker compose -f docker-compose.prebuilt.yml up -d
+
+# Открыть в браузере
+open http://localhost:3001
+```
+
+### Вариант 2: Клонировать и собрать локально
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/[your-org]/calculator.git
-cd calculator
+git clone https://github.com/nikolasalta/calculator-docker-course.git
+cd calculator-docker-course
 
 # Запустить через Docker Compose
 docker compose up --build -d
 
 # Открыть в браузере
-open http://localhost:3000
+open http://localhost:3001
 ```
 
 ### Остановка
@@ -105,13 +125,13 @@ docker run -d --name calc-backend \
 # Запустить frontend
 docker run -d --name calc-frontend \
   --network calc-net \
-  -p 3000:80 \
+  -p 3001:80 \
   calc-frontend:local
 
 # Проверить
 docker ps
 curl http://localhost:8080/api/health
-open http://localhost:3000
+open http://localhost:3001
 ```
 
 ### 2. Docker Compose (рекомендуется)
@@ -137,7 +157,7 @@ open ./test-reports/report.html
 
 | URL | Описание |
 |-----|----------|
-| http://localhost:3000 | UI калькулятора |
+| http://localhost:3001 | UI калькулятора |
 | http://localhost:8080/api/health | Health check |
 | http://localhost:8080/api/calc | API вычислений |
 | http://localhost:4444 | Selenium Grid UI (при запуске тестов) |
