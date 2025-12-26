@@ -19,7 +19,7 @@
 # │ ЭТАП 1: СБОРКА REACT                                                    │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-FROM node:20-alpine AS builder
+FROM node:20.11.1-alpine AS builder
 
 WORKDIR /app
 
@@ -37,7 +37,7 @@ RUN npm run build
 # │ ЭТАП 2: NGINX                                                           │
 # └─────────────────────────────────────────────────────────────────────────┘
 
-FROM nginx:alpine
+FROM nginx:1.25.4-alpine
 
 # Создаем pid файл и даем права пользователю nginx
 RUN touch /var/run/nginx.pid && \
@@ -47,10 +47,7 @@ RUN touch /var/run/nginx.pid && \
     chown -R nginx:nginx /etc/nginx/conf.d
 
 # Копируем собранные файлы React
-COPY --from=builder /app/build /usr/share/nginx/html
-
-# Меняем владельца файлов на nginx
-RUN chown -R nginx:nginx /usr/share/nginx/html
+COPY --from=builder --chown=nginx:nginx /app/build /usr/share/nginx/html
 
 # ВАЖНО: используем nginx.compose.conf вместо nginx.conf
 # В этом конфиге proxy_pass указывает на "backend" (имя сервиса в compose)

@@ -1,53 +1,63 @@
 # QA & DevOps Report
 
-**Date:** 2024-05-22
-**Project:** Calculator Application
-**Reviewer:** Jules
+**Дата:** 26.12.2025
+**Проект:** Calculator Application
+**Ревьювер:** Jules
 
-## 1. Executive Summary
+## 1. Общее резюме (Executive Summary)
 
-A comprehensive QA and DevOps review was conducted on the Calculator application. The review focused on Docker reliability, security best practices, and documentation. Several improvements were identified and implemented, specifically around container security (running as non-root) and application configuration.
+Был проведен полный аудит DevOps и Security составляющих проекта. Основной фокус был сделан на надежность сборки Docker, безопасность контейнеров (hardening) и автоматизацию базовых проверок. Все выявленные критические недостатки были устранены.
 
-## 2. Findings & Actions
+## 2. Найденные проблемы и выполненные действия
 
-### 2.1. Docker Reliability & Configuration
+### 2.1. Надежность Docker (Reliability)
 
-*   **Finding:** The project uses multi-stage builds effectively, which is good for image size and security.
-*   **Finding:** The `backend` service health check relied on `wget`.
-    *   **Action:** Verified that the base image likely supports `wget`. Retained the health check as `eclipse-temurin` typically includes it, but monitored for potential issues. The `docker-compose` health check is correctly configured.
-*   **Finding:** Frontend configuration for Nginx was split between manual and compose modes.
-    *   **Action:** Updated both `nginx.conf` and `nginx.compose.conf` to reflect security changes and port updates.
+*   **Проблема:** Использование тегов `:latest` или плавающих тегов (например, `maven:3.9-eclipse-temurin-17`), что могло привести к невоспроизводимым сборкам в будущем.
+    *   **Решение:** Версии базовых образов зафиксированы (pinned):
+        *   Backend: `maven:3.9.6...`, `eclipse-temurin:17.0.10_7-jre`
+        *   Frontend: `node:20.11.1-alpine`, `nginx:1.25.4-alpine`
+*   **Проблема:** Отсутствие автоматизированной проверки сборки.
+    *   **Решение:** Добавлен скрипт `tests/run_smoke_test.py`, который эмулирует CI-процесс (сборка -> тест -> очистка).
 
-### 2.2. Security
+### 2.2. Безопасность (Security)
 
-*   **Risk (High):** Both Backend and Frontend containers were running as `root` user by default. This poses a significant security risk if the container is compromised.
-    *   **Action (Backend):** Modified `backend/Dockerfile` to create a dedicated user `appuser` and switch to it for execution. Adjusted file permissions for the application JAR.
-    *   **Action (Frontend):** Modified `frontend/Dockerfile` and `frontend/Dockerfile.compose` to run Nginx as the `nginx` user. Changed listening port to 8080 (non-privileged) and adjusted ownership of cache/log directories.
-*   **Risk (Medium):** Missing HTTP security headers in Nginx configuration.
-    *   **Action:** Added `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection`, and `Referrer-Policy` headers to Nginx configurations.
+*   **Риск (High):** Контейнеры запускались от `root` пользователя. Это критический риск безопасности.
+    *   **Решение (Backend):** В `Dockerfile` создан пользователь `appuser`, приложение запускается от его имени.
+    *   **Решение (Frontend):** Nginx переконфигурирован для работы от пользователя `nginx`. Порт изменен на 8080 (так как non-root не может биндиться на порты < 1024), права на директории кэша и логов скорректированы.
+*   **Риск (Medium):** Отсутствовали HTTP-заголовки безопасности в Nginx.
+    *   **Решение:** В конфигурацию Nginx добавлены:
+        *   `X-Frame-Options: SAMEORIGIN`
+        *   `X-Content-Type-Options: nosniff`
+        *   `Referrer-Policy: strict-origin-when-cross-origin`
+        *   `Permissions-Policy`
+        *   (Закомментирован) HSTS header (готов к включению при настройке SSL).
 
-### 2.3. Testing
+### 2.3. Документация
 
-*   **Finding:** Lack of automated smoke tests for the Docker environment.
-    *   **Action:** Created `tests/smoke_test.py`, a Python script to verify:
-        *   Frontend availability (HTTP 200).
-        *   Backend health endpoint (`/api/health`) response.
+*   **Проблема:** README был на английском (в рамках задания требовался русский) и не содержал инструкций по тестированию.
+    *   **Решение:** `README.md` полностью переписан на русском языке, добавлены разделы по запуску, тестированию и траблшутингу.
 
-### 2.4. Documentation
+## 3. Рекомендации (Backlog)
 
-*   **Finding:** README lacked specific instructions for running with Docker Compose and testing.
-    *   **Action:** Rewrote `README.md` to include:
-        *   Clear "How to Run" instructions.
-        *   Details on the new Smoke Test.
-        *   Explanation of security improvements (Non-root, Headers).
+Следующие шаги рекомендуются для дальнейшего улучшения проекта:
 
-## 3. Recommendations for Future
+1.  **Ограничение ресурсов (Resource Limits):**
+    В `docker-compose.yml` стоит добавить секцию `deploy.resources.limits` (CPU/Memory), чтобы один контейнер не мог потребить все ресурсы хоста.
+    *Пример:*
+    ```yaml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+    ```
+2.  **Read-only Filesystem:**
+    По возможности перевести контейнеры в режим `read_only: true`, монтируя только необходимые директории (tmp, logs) как volumes.
+3.  **CI/CD:**
+    Настроить GitHub Actions для запуска `tests/run_smoke_test.py` при каждом пуше.
+4.  **SSL/TLS:**
+    Настроить HTTPS терминацию на уровне Nginx для защиты передаваемых данных.
 
-1.  **CI/CD Pipeline:** Implement a GitHub Actions workflow to automatically build images, run the smoke test, and push to a registry on merge.
-2.  **Vulnerability Scanning:** Integrate tools like Trivy or Grype to scan Docker images for vulnerabilities in dependencies.
-3.  **HTTPS:** Configure SSL/TLS termination in Nginx for production deployment.
-4.  **Logging:** Implement centralized logging (e.g., ELK stack or similar) instead of relying on container logs.
+## 4. Заключение
 
-## 4. Conclusion
-
-The application's deployment posture has been significantly improved. It now adheres to the principle of least privilege by running containers as non-root users and includes basic security hardening. The added smoke test ensures basic reliability of the deployed stack.
+Инфраструктура проекта приведена в соответствие с современными стандартами безопасности и надежности. Проект готов к дальнейшей разработке и эксплуатации.

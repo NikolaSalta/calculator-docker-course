@@ -1,70 +1,84 @@
 # Calculator Project - QA & DevOps Review
 
-This repository contains a full-stack Calculator application with a Java Spring Boot backend and a React frontend.
+Этот репозиторий содержит full-stack приложение "Калькулятор" (Java Spring Boot backend + React frontend).
+В рамках ревью были внесены улучшения в безопасность, стабильность сборки и документацию.
 
-## Project Structure
+## Структура проекта
 
-- `backend/`: Java Spring Boot application
-- `frontend/`: React application with Nginx
-- `docker-compose.yml`: Docker Compose configuration for running the full stack
-- `tests/`: Test scripts
+- `backend/`: Java Spring Boot приложение
+- `frontend/`: React приложение с Nginx
+- `docker-compose.yml`: Конфигурация Docker Compose для запуска
+- `tests/`: Скрипты для автоматического тестирования
 
-## Prerequisites
+## Требования (Prerequisites)
 
-- [Docker](https://docs.docker.com/get-docker/) installed.
-- [Docker Compose](https://docs.docker.com/compose/install/) installed.
+Для работы с проектом вам понадобятся установленные:
 
-## How to Run
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- Python 3 (для запуска smoke-тестов)
 
-1.  **Build and Start** the application using Docker Compose:
+## Сборка и Запуск
+
+1.  **Сборка и запуск приложения**:
+    Выполните следующую команду в корне проекта:
 
     ```bash
     docker compose up --build -d
     ```
+    Эта команда соберет Docker-образы и запустит контейнеры в фоновом режиме.
 
-2.  **Access the Application**:
-    - **Frontend**: Open [http://localhost:3000](http://localhost:3000) in your browser.
-    - **Backend API**: [http://localhost:8080/api/health](http://localhost:8080/api/health)
+2.  **Доступ к приложению**:
+    - **Frontend (Калькулятор)**: Откройте браузер по адресу [http://localhost:3000](http://localhost:3000)
+    - **Backend API (Health check)**: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
-3.  **Stop the Application**:
+3.  **Остановка приложения**:
 
     ```bash
     docker compose down
     ```
 
-## Testing
+## Тестирование (Smoke Tests)
 
-### Smoke Test
-An automated smoke test script is available to verify that the services are up and running.
+В проекте предусмотрен автоматический smoke-тест, который проверяет полный цикл работы: сборку, запуск, доступность сервисов и корректное завершение.
 
-Prerequisite: Python 3 installed.
+**Как запустить тест:**
 
-1.  Start the application (see "How to Run").
-2.  Run the smoke test:
+```bash
+python3 tests/run_smoke_test.py
+```
 
-    ```bash
-    python3 tests/smoke_test.py
-    ```
+Сценарий теста:
+1. Очищает окружение (`docker compose down`).
+2. Собирает и запускает проект (`docker compose up --build`).
+3. Проверяет доступность Frontend (HTTP 200).
+4. Проверяет статус Backend API (`{"status": "OK"}`).
+5. Останавливает контейнеры.
 
-    You should see output indicating that both Frontend and Backend are UP and healthy.
+## Безопасность и Конфигурация
 
-## Security & Configuration Notes
+Проект настроен с учетом Best Practices по безопасности и DevOps:
 
-This project has been configured with DevOps best practices:
+- **Non-root пользователи**:
+  - Backend запускается под пользователем `appuser`.
+  - Frontend (Nginx) запускается под пользователем `nginx`.
+- **Security Headers**: В Nginx добавлены заголовки безопасности (`X-Frame-Options`, `X-Content-Type-Options`, `Permissions-Policy` и др.).
+- **Reproducible Builds**: Используются фиксированные версии базовых образов (pinned versions) вместо тега `:latest`.
+- **Healthchecks**: Настроены проверки здоровья (healthchecks) для обоих сервисов в `docker-compose.yml`.
 
-- **Non-root containers**: Both Backend and Frontend containers run as non-privileged users (`appuser` and `nginx` respectively) to minimize security risks.
-- **Security Headers**: Nginx is configured with security headers:
-    - `X-Frame-Options: SAMEORIGIN`
-    - `X-Content-Type-Options: nosniff`
-    - `X-XSS-Protection: 1; mode=block`
-    - `Referrer-Policy: strict-origin-when-cross-origin`
-- **Multi-stage Builds**: Dockerfiles use multi-stage builds to keep image sizes small and exclude source code from production images.
-- **Port 8080**: Both services inside containers listen on port 8080 to allow non-root operation.
+## Устранение неполадок (Troubleshooting)
 
-## Development
+- **Порт занят (Port already in use)**:
+  Если вы видите ошибку `Bind for 0.0.0.0:3000 failed: port is already allocated`, значит порт 3000 занят другим процессом. Освободите порт или измените маппинг портов в `docker-compose.yml`.
 
-- **Backend**: Standard Maven project.
-  - Build: `mvn clean package`
-- **Frontend**: Standard Node.js/React project.
-  - Install: `npm install`
-  - Start: `npm start`
+- **Ошибки сборки**:
+  Попробуйте выполнить сборку без кеша:
+  ```bash
+  docker compose build --no-cache
+  ```
+
+- **Просмотр логов**:
+  Если контейнеры падают или работают некорректно, проверьте логи:
+  ```bash
+  docker compose logs -f
+  ```

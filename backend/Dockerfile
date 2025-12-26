@@ -22,7 +22,7 @@
 # - Maven 3.9 (инструмент сборки Java)
 # - Eclipse Temurin JDK 17 (Java Development Kit)
 # AS builder — имя этапа, на него можно ссылаться позже
-FROM maven:3.9-eclipse-temurin-17 AS builder
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # WORKDIR — установить рабочую директорию
 # Все последующие команды выполняются в этой папке
@@ -53,7 +53,7 @@ RUN mvn clean package -DskipTests
 # eclipse-temurin:17-jre — JRE 17 (поддерживает ARM и x86)
 # Примечание: alpine-версия не поддерживает Apple Silicon (ARM),
 # поэтому используем стандартную версию
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17.0.10_7-jre
 
 # Создаем пользователя appuser для запуска приложения без прав root
 RUN groupadd -r appuser && useradd -r -g appuser appuser

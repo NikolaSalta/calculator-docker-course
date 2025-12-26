@@ -20,7 +20,7 @@
 
 # node:20-alpine — Node.js 20 на минимальном Alpine Linux
 # Alpine делает образ меньше (~150MB вместо ~1GB)
-FROM node:20-alpine AS builder
+FROM node:20.11.1-alpine AS builder
 
 # Рабочая директория внутри контейнера
 WORKDIR /app
@@ -55,7 +55,7 @@ RUN npm run build
 # └─────────────────────────────────────────────────────────────────────────┘
 
 # nginx:alpine — веб-сервер nginx на Alpine Linux (~25MB)
-FROM nginx:alpine
+FROM nginx:1.25.4-alpine
 
 # Создаем pid файл и даем права пользователю nginx
 RUN touch /var/run/nginx.pid && \
@@ -67,10 +67,7 @@ RUN touch /var/run/nginx.pid && \
 # Копируем собранные файлы React из этапа builder
 # /app/build (из builder) → /usr/share/nginx/html (в nginx)
 # Это стандартная директория для статических файлов в nginx
-COPY --from=builder /app/build /usr/share/nginx/html
-
-# Меняем владельца файлов на nginx
-RUN chown -R nginx:nginx /usr/share/nginx/html
+COPY --from=builder --chown=nginx:nginx /app/build /usr/share/nginx/html
 
 # Копируем конфигурацию nginx
 # nginx.conf содержит настройки проксирования /api в backend

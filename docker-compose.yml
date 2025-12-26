@@ -104,6 +104,13 @@ services:
     ports:
       - "3000:8080"
     
+    # Healthcheck для Frontend
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
     # depends_on — зависимость от других сервисов
     # frontend запустится ПОСЛЕ backend
     #
