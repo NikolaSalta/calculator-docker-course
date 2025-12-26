@@ -202,6 +202,17 @@ open ./test-reports/report.html
 
 ## 🧪 Тестирование
 
+> 📖 **Полная документация:** [TESTING_DOCUMENTATION.md](TESTING_DOCUMENTATION.md)
+
+### Просмотр отчётов в браузере
+
+```bash
+# Запустить сервер отчётов (после выполнения тестов)
+docker compose -f docker-compose.reports.yml up -d
+
+# Открыть http://localhost:9000/report.html
+```
+
 ### Запуск всех тестов
 ```bash
 docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
