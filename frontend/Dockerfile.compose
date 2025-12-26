@@ -2,16 +2,7 @@
 # Dockerfile.compose для Frontend (React + nginx)
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Это версия для Docker Compose.
-# Единственное отличие от Dockerfile — используется nginx.compose.conf
-#
-# Почему два файла?
-# - В manual режиме контейнер называется "calc-backend"
-# - В compose режиме сервис называется "backend"
-# - nginx должен проксировать на правильное имя
-#
-# В Dockerfile: proxy_pass http://calc-backend:8080
-# Здесь:        proxy_pass http://backend:8080
+# Multi-stage build с улучшениями безопасности
 # ═══════════════════════════════════════════════════════════════════════════
 
 
@@ -39,12 +30,23 @@ RUN npm run build
 
 FROM nginx:alpine
 
+# ═══════════════════════════════════════════════════════════════════════════
+# БЕЗОПАСНОСТЬ: nginx уже запускается от пользователя nginx в alpine
+# Дополнительно удаляем ненужные файлы
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Удаляем дефолтную конфигурацию
+RUN rm -rf /usr/share/nginx/html/*
+
 # Копируем собранные файлы React
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# ВАЖНО: используем nginx.compose.conf вместо nginx.conf
-# В этом конфиге proxy_pass указывает на "backend" (имя сервиса в compose)
+# Копируем конфигурацию nginx для Docker Compose
 COPY nginx.compose.conf /etc/nginx/conf.d/default.conf
+
+# Устанавливаем правильные права
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 
 EXPOSE 80
 

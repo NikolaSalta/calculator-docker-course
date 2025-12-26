@@ -220,14 +220,16 @@ class TestCalculatorAPI:
         
         Это важный edge case (граничный случай).
         
-        Что может произойти:
+        Что проверяем:
         ─────────────────────────────────────────
-        1. Приложение падает с exception → 500 Internal Server Error (плохо)
-        2. Приложение возвращает ошибку → 400 Bad Request (нормально)
-        3. Java возвращает Infinity или NaN → 200 OK (наш случай)
+        1. Сервер возвращает 400 Bad Request (валидационная ошибка)
+        2. В ответе есть понятное сообщение об ошибке
+        3. Приложение НЕ падает (не 500 Internal Server Error)
         
-        В Java: 10.0 / 0.0 = Infinity (бесконечность)
-        JSON: {"result": "Infinity"} или {"result": null}
+        Почему 400, а не 200:
+        ─────────────────────────────────────────
+        Деление на ноль — это ошибка входных данных.
+        Клиент должен получить понятную ошибку, а не странный результат.
         """
         resp = requests.post(
             f"{BACKEND_URL}/api/calc",
@@ -235,9 +237,13 @@ class TestCalculatorAPI:
             timeout=REQUEST_TIMEOUT
         )
         
-        # Главное — приложение НЕ упало (не 500)
-        # 200 OK — валидный ответ, даже если result странный
-        assert resp.status_code == 200
+        # Ожидаем 400 Bad Request с сообщением об ошибке
+        assert resp.status_code == 400, f"Ожидали 400, получили {resp.status_code}"
+        
+        # Проверяем что в ответе есть сообщение об ошибке
+        data = resp.json()
+        assert "message" in data, "Ожидали message в ответе"
+        assert "zero" in data["message"].lower(), f"Ожидали упоминание zero в: {data['message']}"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
