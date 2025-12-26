@@ -162,9 +162,12 @@ services:
       - STARTUP_WAIT=90
       
       # ═══════════════════════════════════════════════════════════════════
-      # HEADLESS MODE = OFF (видимый браузер!)
+      # РЕЖИМ БРАУЗЕРА
       # ═══════════════════════════════════════════════════════════════════
-      # Эта переменная говорит тестам НЕ использовать headless режим
+      # USE_EMBEDDED_BROWSER=false — использовать удалённый Selenium Grid
+      - USE_EMBEDDED_BROWSER=false
+      
+      # HEADLESS MODE = OFF (видимый браузер через noVNC!)
       - HEADLESS=false
     
     depends_on:
