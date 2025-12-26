@@ -81,10 +81,33 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://frontend:80")
 # Если SELENIUM_HUB_URL не установлен — UI-тесты не будут работать
 SELENIUM_HUB_URL = os.getenv("SELENIUM_HUB_URL", "http://selenium-hub:4444")
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SELENIUM REMOTE URL — для прямого подключения к standalone-chrome
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Используется с selenium/standalone-chrome (с noVNC).
+# Формат: http://hostname:4444/wd/hub
+#
+# Преимущество standalone-chrome:
+# - Встроенный VNC/noVNC сервер
+# - Можно видеть браузер в реальном времени: http://localhost:7900
+SELENIUM_REMOTE_URL = os.getenv("SELENIUM_REMOTE_URL", SELENIUM_HUB_URL)
+
 # Какой браузер использовать для Selenium-тестов
 # Варианты: "chrome", "firefox"
 # Chrome обычно быстрее и стабильнее
 BROWSER = os.getenv("BROWSER", "chrome")
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HEADLESS MODE — режим без графического интерфейса
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# HEADLESS=true  — браузер без GUI (быстрее, меньше ресурсов, для CI/CD)
+# HEADLESS=false — браузер с GUI (можно видеть через VNC/noVNC)
+#
+# По умолчанию: true (headless) — для совместимости с CI/CD
+# Для визуального тестирования установите: HEADLESS=false
+HEADLESS = os.getenv("HEADLESS", "true").lower() in ("true", "1", "yes")
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

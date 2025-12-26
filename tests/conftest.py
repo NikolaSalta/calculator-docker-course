@@ -72,8 +72,10 @@ from test_config import (
     BACKEND_URL,
     FRONTEND_URL,
     SELENIUM_HUB_URL,
+    SELENIUM_REMOTE_URL,
     STARTUP_WAIT,
-    BROWSER
+    BROWSER,
+    HEADLESS
 )
 
 
@@ -253,21 +255,31 @@ def browser():
     options = ChromeOptions()
     
     # ─────────────────────────────────────────────────────────────────────────
-    # HEADLESS MODE
+    # HEADLESS MODE (опционально)
     # ─────────────────────────────────────────────────────────────────────────
     #
-    # --headless=new — запустить Chrome без графического интерфейса
+    # HEADLESS=true  — браузер без GUI (для CI/CD)
+    # HEADLESS=false — браузер с GUI (можно видеть через VNC/noVNC!)
     #
-    # Headless означает "без головы" = без GUI (окна).
-    # Браузер работает в памяти, ничего не отображая на экране.
+    # Когда использовать headless=false:
+    # - Отладка тестов: видите что происходит в браузере
+    # - Визуальное тестирование: открываете http://localhost:7900
+    # - Демонстрация: показываете тесты клиенту/команде
     #
-    # Преимущества headless:
-    # - Быстрее (не тратит ресурсы на рендеринг UI)
-    # - Работает на серверах без монитора (CI/CD, Docker)
-    # - Меньше потребляет памяти
-    #
-    # =new — новый headless-режим Chrome (более стабильный)
-    options.add_argument("--headless=new")
+    # Когда использовать headless=true:
+    # - CI/CD пайплайны (GitHub Actions, GitLab CI)
+    # - Быстрые прогоны (меньше ресурсов)
+    # - Серверы без GUI
+    if HEADLESS:
+        # --headless=new — запустить Chrome без графического интерфейса
+        # =new — новый headless-режим Chrome (более стабильный)
+        options.add_argument("--headless=new")
+        print("🖥️  Режим: HEADLESS (без GUI)")
+    else:
+        # Видимый режим — можно смотреть через VNC/noVNC!
+        # --start-maximized — открыть браузер на весь экран
+        options.add_argument("--start-maximized")
+        print("🎬 Режим: VISIBLE (смотрите на http://localhost:7900)")
     
     # ─────────────────────────────────────────────────────────────────────────
     # БЕЗОПАСНОСТЬ И DOCKER
@@ -296,7 +308,7 @@ def browser():
     options.add_argument("--disable-dev-shm-usage")
     
     # ─────────────────────────────────────────────────────────────────────────
-    # РАЗМЕР ОКНА
+    # РАЗМЕР ОКНА (для headless режима)
     # ─────────────────────────────────────────────────────────────────────────
     #
     # --window-size=1920,1080 — размер окна браузера в пикселях
@@ -305,27 +317,29 @@ def browser():
     # Responsive-вёрстка меняется в зависимости от ширины.
     #
     # 1920x1080 (Full HD) — стандартное разрешение десктопа.
-    # Для мобильного тестирования можно использовать 375x667 (iPhone).
-    options.add_argument("--window-size=1920,1080")
+    if HEADLESS:
+        options.add_argument("--window-size=1920,1080")
     
     # ─────────────────────────────────────────────────────────────────────────
-    # ПОДКЛЮЧЕНИЕ К SELENIUM GRID
+    # ПОДКЛЮЧЕНИЕ К SELENIUM
     # ─────────────────────────────────────────────────────────────────────────
     #
     # webdriver.Remote — создаёт WebDriver для удалённого браузера
     #
     # Почему "удалённый"?
     # Браузер Chrome запущен в ДРУГОМ контейнере (selenium-chrome).
-    # Мы подключаемся к нему по сети через Selenium Hub.
+    # Мы подключаемся к нему по сети через Selenium.
     #
-    # Путь запроса:
-    # 1. Тест → Selenium Hub (http://selenium-hub:4444)
-    # 2. Hub → Chrome Node (selenium-chrome контейнер)
-    # 3. Chrome выполняет команду
-    # 4. Результат возвращается обратно
+    # SELENIUM_REMOTE_URL — для standalone-chrome с VNC
+    # Формат: http://selenium-chrome:4444/wd/hub
+    #
+    # 🎬 С standalone-chrome вы можете:
+    # - Открыть http://localhost:7900 в браузере
+    # - Видеть Chrome в реальном времени
+    # - Наблюдать как тесты кликают, вводят текст
     driver = webdriver.Remote(
-        # URL Selenium Hub
-        command_executor=SELENIUM_HUB_URL,
+        # URL Selenium (standalone-chrome или Hub)
+        command_executor=SELENIUM_REMOTE_URL,
         # Настройки браузера
         options=options
     )
