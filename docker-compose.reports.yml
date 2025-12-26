@@ -1,0 +1,66 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# docker-compose.reports.yml — Сервер для просмотра HTML-отчётов тестов
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Этот compose-файл запускает простой веб-сервер для просмотра
+# HTML-отчётов тестов в браузере.
+#
+# Использование:
+#   docker compose -f docker-compose.reports.yml up -d
+#
+# Открыть в браузере:
+#   http://localhost:9000/report.html
+#
+# Остановить:
+#   docker compose -f docker-compose.reports.yml down
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # report-server — Nginx для отдачи HTML-отчётов
+  # ─────────────────────────────────────────────────────────────────────────────
+  report-server:
+    image: nginx:alpine
+    container_name: test-report-server
+    
+    # Порт 9000 для доступа к отчётам
+    ports:
+      - "9000:80"
+    
+    # Монтируем папку с отчётами
+    volumes:
+      - ./test-reports:/usr/share/nginx/html:ro
+    
+    # Красивый вывод при запуске
+    labels:
+      - "com.docker.compose.description=Test Report Server"
+    
+    # Перезапуск при падении
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ИНСТРУКЦИЯ
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# 1. Сначала запустите тесты (чтобы создать отчёт):
+#    docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+#
+# 2. Затем запустите сервер отчётов:
+#    docker compose -f docker-compose.reports.yml up -d
+#
+# 3. Откройте в браузере:
+#    http://localhost:9000/report.html
+#
+# 4. После просмотра остановите сервер:
+#    docker compose -f docker-compose.reports.yml down
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+

@@ -41,6 +41,7 @@
 |-------|--------|
 | **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend |
 | **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend |
+| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests |
 
 ### Вариант 1: Запуск из готовых образов (быстро!)
 
