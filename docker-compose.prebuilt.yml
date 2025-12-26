@@ -22,7 +22,7 @@ services:
   backend:
     # Используем готовый образ вместо сборки
     # Замените 'your-username' на ваш username Docker Hub
-    image: ${DOCKER_USERNAME:-your-username}/calculator-docker-backend:latest
+    image: ${DOCKER_USERNAME:-nikolaysaltan}/calculator-docker-backend:latest
     
     container_name: calc-backend
     
@@ -51,7 +51,7 @@ services:
   # ─────────────────────────────────────────────────────────────────────────
   frontend:
     # Используем готовый образ вместо сборки
-    image: ${DOCKER_USERNAME:-your-username}/calculator-docker-frontend:latest
+    image: ${DOCKER_USERNAME:-nikolaysaltan}/calculator-docker-frontend:latest
     
     container_name: calc-frontend
     

@@ -20,7 +20,7 @@ set -e
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Ваш username на Docker Hub или GitHub
-DOCKER_USERNAME="${DOCKER_USERNAME:-your-username}"
+DOCKER_USERNAME="${DOCKER_USERNAME:-nikolaysaltan}"
 
 # Название репозитория
 REPO_NAME="calculator-docker"

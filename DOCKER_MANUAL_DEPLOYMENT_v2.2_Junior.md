@@ -134,10 +134,19 @@ git clone https://github.com/YOUR_USERNAME/calculator-docker-course.git
 cd calculator-docker-course/ykg
 ```
 
-### Шаг 3.2: Установить username владельца образов
+### Шаг 3.2: Запустить из готовых образов
+
+Образы уже опубликованы на Docker Hub под username `nikolaysaltan`:
 
 ```bash
-export DOCKER_USERNAME=nikolay-docker  # замените на актуальный username
+# Образы доступны по умолчанию, не нужно ничего настраивать!
+docker compose -f docker-compose.prebuilt.yml up -d
+```
+
+Или с явным указанием username:
+
+```bash
+export DOCKER_USERNAME=nikolaysaltan
 ```
 
 ### Шаг 3.3: Запустить из готовых образов
