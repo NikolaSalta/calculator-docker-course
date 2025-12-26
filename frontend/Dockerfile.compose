@@ -109,8 +109,9 @@ RUN cd /opt/novnc/utils && \
 # НАСТРОЙКА NGINX
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Удаляем дефолтную конфигурацию
-RUN rm -rf /usr/share/nginx/html/*
+# Удаляем дефолтную конфигурацию и дефолтный сайт
+RUN rm -rf /usr/share/nginx/html/* && \
+    rm -f /etc/nginx/sites-enabled/default
 
 # Копируем собранные файлы React
 COPY --from=builder /app/build /usr/share/nginx/html
@@ -144,8 +145,15 @@ set -e\n\
 # Запускаем nginx в фоне\n\
 nginx -g "daemon off;" &\n\
 \n\
-# Ждём пока nginx запустится\n\
-sleep 3\n\
+# Ждём пока nginx запустится и React-приложение станет доступно\n\
+echo "⏳ Ожидание nginx..."\n\
+for i in {1..10}; do\n\
+  if curl -s http://localhost | grep -q "Docker Calculator"; then\n\
+    echo "✅ Nginx готов!"\n\
+    break\n\
+  fi\n\
+  sleep 1\n\
+done\n\
 \n\
 # Запускаем виртуальный дисплей\n\
 export DISPLAY=:99\n\
@@ -160,9 +168,24 @@ sleep 2\n\
 x11vnc -display :99 -nopw -listen localhost -xkb -ncache 10 -ncache_cr -forever -shared -rfbport 5901 &\n\
 sleep 2\n\
 \n\
+# Дополнительная проверка nginx\n\
+echo "🔍 Проверяем nginx..."\n\
+for i in {1..5}; do\n\
+  if curl -s http://localhost:80 | grep -q "Docker Calculator"; then\n\
+    echo "✅ React-приложение доступно!"\n\
+    break\n\
+  fi\n\
+  echo "⏳ Ждём nginx... ($i/5)"\n\
+  sleep 2\n\
+done\n\
+\n\
 # Открываем браузер с приложением\n\
-chromium --no-sandbox --disable-dev-shm-usage --start-maximized --display=:99 http://localhost:80 &\n\
-sleep 3\n\
+echo "🌐 Открываем браузер с приложением..."\n\
+chromium --no-sandbox --disable-dev-shm-usage --start-maximized --display=:99 \\\n\
+  --disable-web-security --disable-features=VizDisplayCompositor \\\n\
+  --force-device-scale-factor=1 --new-window \\\n\
+  --app=http://localhost:80 &\n\
+sleep 5\n\
 \n\
 # Запускаем noVNC\n\
 cd /opt/novnc/utils && python3 -m websockify --web=/opt/novnc 6080 localhost:5901 &\n\
