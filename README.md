@@ -39,9 +39,9 @@
 
 | Образ | Ссылка |
 |-------|--------|
-| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend |
-| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend |
-| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests |
+| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=amd64) |
+| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=amd64) |
+| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests (x86: https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64) |
 
 ### Вариант 1: Запуск из готовых образов (быстро!)
 
@@ -247,18 +247,6 @@ docker compose -f docker-compose.reports.yml up -d
 ### Запуск всех тестов
 ```bash
 docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
-```
-
-### Сборка тест-образа под конкретную архитектуру (2 Dockerfile)
-
-```bash
-# ARM64 (Apple Silicon) — tests/Dockerfile.arm64
-docker buildx build --platform linux/arm64 -f tests/Dockerfile.arm64 \
-  -t nikolaysaltan/calculator-docker-tests:arm64 --push ./tests
-
-# AMD64/x86_64 (Windows/Linux) — tests/Dockerfile.amd64
-docker buildx build --platform linux/amd64 -f tests/Dockerfile.amd64 \
-  -t nikolaysaltan/calculator-docker-tests:amd64 --push ./tests
 ```
 
 ### Только smoke-тесты

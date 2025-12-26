@@ -145,6 +145,11 @@ kill -9 <PID>
 # Скачать образы вручную (опционально, docker compose скачает автоматически)
 docker pull nikolaysaltan/calculator-docker-backend:latest
 docker pull nikolaysaltan/calculator-docker-frontend:latest
+
+# Скачать x86_64 (Windows/Linux) варианты (если нужно явно)
+docker pull --platform linux/amd64 nikolaysaltan/calculator-docker-backend:amd64
+docker pull --platform linux/amd64 nikolaysaltan/calculator-docker-frontend:amd64
+docker pull --platform linux/amd64 nikolaysaltan/calculator-docker-tests:amd64
 ```
 
 ### Шаг 3.1: Скачать docker-compose файл

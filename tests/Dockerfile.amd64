@@ -1,35 +1,29 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# Dockerfile.amd64 — тесты + браузер ВНУТРИ контейнера (x86_64 / Windows)
+# Dockerfile.amd64 — Тесты (AMD64 / x86_64 / Windows/Linux) + встроенный Chromium
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Этот Dockerfile предназначен для сборки под:
-#   --platform linux/amd64
+# Отдельный Dockerfile для классической x86_64 архитектуры (Windows/Linux).
+# Здесь используем Debian Bookworm slim (стабильнее для Chromium-зависимостей).
 #
-# Пример:
-#   docker buildx build --platform linux/amd64 -f tests/Dockerfile.amd64 \
-#     -t nikolaysaltan/calculator-docker-tests:amd64 --push tests
-#
-# Режим запуска:
-# - USE_EMBEDDED_BROWSER=true  → webdriver.Chrome локально (Chromium внутри)
-# - HEADLESS=true             → headless режим (по умолчанию)
+# Поддержка:
+# - linux/amd64 (x86_64)
 # ═══════════════════════════════════════════════════════════════════════════
 
-FROM python:3.12-slim-bookworm
+# Легковесная база (как просили): slim
+FROM python:3.12-slim
 
 LABEL maintainer="nikolaysaltan"
-LABEL description="Calculator Docker Tests (AMD64) with embedded Chromium browser"
-LABEL version="2.0-amd64"
+LABEL description="Calculator Docker Tests (AMD64) with embedded Chromium"
 
 WORKDIR /tests
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Chromium + ChromeDriver (AMD64)
+# Chromium + ChromeDriver (внутри контейнера)
 # ─────────────────────────────────────────────────────────────────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     chromium-driver \
     fonts-liberation \
-    fonts-noto-color-emoji \
     libnss3 \
     libatk1.0-0 \
     libatk-bridge2.0-0 \
@@ -42,21 +36,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrandr2 \
     libgbm1 \
     libasound2 \
-    curl \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
+# Запуск не от root
 RUN groupadd -r testuser && useradd -r -g testuser testuser
 
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-ENV USE_EMBEDDED_BROWSER=true
+
+# По умолчанию: используем REMOTE Selenium/noVNC (как уже настроено в проекте).
+# Для встроенного браузера включите:
+#   USE_EMBEDDED_BROWSER=true
+ENV USE_EMBEDDED_BROWSER=false
 ENV HEADLESS=true
 ENV PYTHONUNBUFFERED=1
 
+# Зависимости
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Тесты
 COPY pytest.ini .
 COPY conftest.py .
 COPY test_config.py .
@@ -64,6 +64,7 @@ COPY test_api.py .
 COPY test_ui_selenium.py .
 
 RUN mkdir -p /tests/reports && chown -R testuser:testuser /tests
+
 USER testuser
 
 ENTRYPOINT ["pytest"]
