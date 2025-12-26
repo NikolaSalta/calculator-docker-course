@@ -56,22 +56,27 @@ services:
     
     container_name: calc-frontend
     
-    # ИСПРАВЛЕНИЕ: Порт 3001 вместо 3000 (конфликт с Grafana)
+    # Порты:
+    # - 3001:80 — веб-приложение (nginx)
+    # - 5901:5901 — VNC сервер (для прямого подключения)
+    # - 7900:6080 — noVNC (веб-доступ к браузеру)
     ports:
       - "3001:80"
+      - "5901:5901"
+      - "7900:6080"
     
     # УЛУЧШЕНИЕ: Ждём пока backend станет healthy
     depends_on:
       backend:
         condition: service_healthy
     
-    # Ограничения ресурсов для nginx
+    # Ограничения ресурсов (увеличено для браузера)
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 512M
         reservations:
-          memory: 64M
+          memory: 256M
 
 
 # ═══════════════════════════════════════════════════════════════════════════
