@@ -729,7 +729,24 @@ docker compose -f docker-compose.selenium.yml up --build
 # Откройте http://localhost:7900 (пароль: secret)
 ```
 
-### 9.5 Dockerfile
+### 9.5 Сборка Multi-Platform образов
+
+```bash
+# Создать buildx builder для multi-platform сборки
+docker buildx create --name multiplatform --use
+
+# Собрать и загрузить образы для обеих архитектур
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -t nikolaysaltan/calculator-docker-tests:latest \
+  -t nikolaysaltan/calculator-docker-tests:v2.0-multiarch \
+  --push ./tests
+
+# Или собрать только для своей архитектуры
+docker build -t nikolaysaltan/calculator-docker-tests:v2.0 ./tests
+docker push nikolaysaltan/calculator-docker-tests:v2.0
+```
+
+### 9.6 Dockerfile
 
 ```dockerfile
 FROM python:3.12-slim-bookworm
