@@ -75,8 +75,15 @@ from test_config import (
     SELENIUM_REMOTE_URL,
     STARTUP_WAIT,
     BROWSER,
-    HEADLESS
+    HEADLESS,
+    USE_EMBEDDED_BROWSER
 )
+
+# Service для локального Chromium
+from selenium.webdriver.chrome.service import Service as ChromeService
+
+# os для проверки путей
+import os
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -321,28 +328,66 @@ def browser():
         options.add_argument("--window-size=1920,1080")
     
     # ─────────────────────────────────────────────────────────────────────────
-    # ПОДКЛЮЧЕНИЕ К SELENIUM
+    # ПОДКЛЮЧЕНИЕ К БРАУЗЕРУ
     # ─────────────────────────────────────────────────────────────────────────
     #
-    # webdriver.Remote — создаёт WebDriver для удалённого браузера
+    # Два режима работы:
     #
-    # Почему "удалённый"?
-    # Браузер Chrome запущен в ДРУГОМ контейнере (selenium-chrome).
-    # Мы подключаемся к нему по сети через Selenium.
+    # 1. USE_EMBEDDED_BROWSER=true — локальный Chromium внутри контейнера
+    #    Используется webdriver.Chrome() с локальным ChromeDriver
+    #    Не требует внешнего Selenium Grid
     #
-    # SELENIUM_REMOTE_URL — для standalone-chrome с VNC
-    # Формат: http://selenium-chrome:4444/wd/hub
-    #
-    # 🎬 С standalone-chrome вы можете:
-    # - Открыть http://localhost:7900 в браузере
-    # - Видеть Chrome в реальном времени
-    # - Наблюдать как тесты кликают, вводят текст
-    driver = webdriver.Remote(
-        # URL Selenium (standalone-chrome или Hub)
-        command_executor=SELENIUM_REMOTE_URL,
-        # Настройки браузера
-        options=options
-    )
+    # 2. USE_EMBEDDED_BROWSER=false — внешний Selenium Grid/noVNC
+    #    Используется webdriver.Remote() для подключения к selenium-chrome
+    #    Можно видеть браузер через http://localhost:7900
+    # ─────────────────────────────────────────────────────────────────────────
+    
+    if USE_EMBEDDED_BROWSER:
+        # ═══════════════════════════════════════════════════════════════════
+        # РЕЖИМ 1: ВСТРОЕННЫЙ БРАУЗЕР
+        # ═══════════════════════════════════════════════════════════════════
+        #
+        # Используем локальный Chromium и ChromeDriver из контейнера
+        # Это быстрее и не требует дополнительных контейнеров
+        print("🏠 Режим: EMBEDDED BROWSER (Chromium внутри контейнера)")
+        
+        # Путь к ChromeDriver в контейнере
+        chromedriver_path = os.getenv("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+        
+        # Создаём Service для ChromeDriver
+        service = ChromeService(executable_path=chromedriver_path)
+        
+        # Создаём локальный WebDriver
+        driver = webdriver.Chrome(
+            service=service,
+            options=options
+        )
+    else:
+        # ═══════════════════════════════════════════════════════════════════
+        # РЕЖИМ 2: УДАЛЁННЫЙ SELENIUM (с noVNC)
+        # ═══════════════════════════════════════════════════════════════════
+        #
+        # webdriver.Remote — создаёт WebDriver для удалённого браузера
+        #
+        # Почему "удалённый"?
+        # Браузер Chrome запущен в ДРУГОМ контейнере (selenium-chrome).
+        # Мы подключаемся к нему по сети через Selenium.
+        #
+        # SELENIUM_REMOTE_URL — для standalone-chrome с VNC
+        # Формат: http://selenium-chrome:4444/wd/hub
+        #
+        # 🎬 С standalone-chrome вы можете:
+        # - Открыть http://localhost:7900 в браузере
+        # - Видеть Chrome в реальном времени
+        # - Наблюдать как тесты кликают, вводят текст
+        print(f"🌐 Режим: REMOTE SELENIUM ({SELENIUM_REMOTE_URL})")
+        
+        driver = webdriver.Remote(
+            # URL Selenium (standalone-chrome или Hub)
+            command_executor=SELENIUM_REMOTE_URL,
+            # Настройки браузера
+            options=options
+        )
     
     # ─────────────────────────────────────────────────────────────────────────
     # IMPLICIT WAIT
@@ -402,13 +447,27 @@ def pytest_runtest_makereport(item, call):
         # Получаем docstring теста
         docstring = item.function.__doc__
         if docstring:
-            # Берём первые 3 строки docstring (краткое описание)
+            # Парсим docstring: берём первую строку как заголовок
             lines = [line.strip() for line in docstring.strip().split('\n') if line.strip()]
-            description = '\n'.join(lines[:3])
+            
+            # Первая строка — краткое описание
+            title = lines[0] if lines else "Без описания"
+            
+            # Остальные строки — детали (до первой пустой или линии с "─")
+            details = []
+            for line in lines[1:]:
+                if line.startswith('─') or line.startswith('═'):
+                    break
+                details.append(line)
+            
+            # Форматируем описание
+            description = f"<strong>{title}</strong>"
+            if details:
+                description += f"<br><small>{' '.join(details[:2])}</small>"
             
             # Добавляем в extra для pytest-html
             extra = getattr(report, 'extra', [])
-            extra.append(extras.html(f'<div class="description"><strong>Описание:</strong><br>{description}</div>'))
+            extra.append(extras.html(f'<div class="description">{description}</div>'))
             report.extra = extra
 
 
@@ -416,29 +475,29 @@ def pytest_html_results_table_header(cells):
     """
     Добавляет колонку "Описание" в таблицу результатов HTML-отчёта.
     """
-    cells.insert(2, '<th>Описание</th>')
+    cells.insert(2, '<th style="min-width: 250px;">Описание</th>')
 
 
 def pytest_html_results_table_row(report, cells):
     """
     Добавляет описание теста (docstring) в строку таблицы HTML-отчёта.
     """
-    # Извлекаем docstring из nodeid
-    if hasattr(report, 'nodeid'):
-        # Получаем краткое описание из первой строки docstring
-        description = '—'
-        
-        # Пытаемся извлечь из extra
-        if hasattr(report, 'extra') and report.extra:
-            for extra in report.extra:
-                if hasattr(extra, 'content') and 'Описание:' in str(extra.content):
-                    # Извлекаем текст описания
-                    import re
-                    match = re.search(r'<strong>Описание:</strong><br>(.*?)</div>', str(extra.content))
-                    if match:
-                        description = match.group(1).replace('\n', '<br>')
-                        break
-        
-        cells.insert(2, f'<td style="max-width: 300px; word-wrap: break-word;">{description}</td>')
-    else:
-        cells.insert(2, '<td>—</td>')
+    import re
+    description = '—'
+    
+    # Пытаемся извлечь из extra (где мы сохранили docstring)
+    if hasattr(report, 'extra') and report.extra:
+        for extra in report.extra:
+            content = str(getattr(extra, 'content', ''))
+            if '<strong>' in content:
+                # Извлекаем текст между <strong> и </div>
+                match = re.search(r'<strong>(.*?)</strong>', content, re.DOTALL)
+                if match:
+                    description = match.group(1).strip()
+                    # Добавляем детали если есть
+                    details_match = re.search(r'<small>(.*?)</small>', content, re.DOTALL)
+                    if details_match:
+                        description += f"<br><small style='color: #666;'>{details_match.group(1)}</small>"
+                    break
+    
+    cells.insert(2, f'<td style="max-width: 350px; word-wrap: break-word; text-align: left;">{description}</td>')

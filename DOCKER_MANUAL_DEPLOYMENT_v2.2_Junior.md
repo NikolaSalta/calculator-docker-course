@@ -128,10 +128,18 @@ kill -9 <PID>
 
 ### 📦 Готовые образы на Docker Hub
 
-| Образ | Ссылка | Размер |
-|-------|--------|--------|
-| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend | ~127 MB |
-| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend | ~45 MB |
+| Образ | Ссылка | Размер | Архитектура |
+|-------|--------|--------|-------------|
+| **Backend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend | ~127 MB | amd64, arm64 |
+| **Frontend** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend | ~45 MB | amd64, arm64 |
+| **Tests** | https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests | ~350 MB | amd64, arm64 |
+
+> 📦 **Multi-Platform:** Образы работают на Windows, Linux, Intel Mac и Apple Silicon (M1/M2/M3)!
+
+**Образ тестов содержит:**
+- Chromium браузер (встроен!)
+- ChromeDriver
+- Python 3.12 + pytest + selenium
 
 ```bash
 # Скачать образы вручную (опционально, docker compose скачает автоматически)
@@ -1301,9 +1309,15 @@ export DOCKER_USERNAME=your-github-username
 
 ### 11.6: Использование опубликованных образов
 
-**Пример опубликованных образов (Docker Hub):**
-- 🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend
-- 🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend
+**Опубликованные образы на Docker Hub (Multi-Platform: AMD64 + ARM64):**
+
+| Образ | Ссылка | Описание |
+|-------|--------|----------|
+| **Backend** | 🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend | Java Spring Boot API |
+| **Frontend** | 🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend | React + Nginx |
+| **Tests** | 🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests | pytest + Selenium + Chromium |
+
+> 💡 **Поддержка архитектур:** Все образы работают на Windows (x86), Linux и Apple Silicon (M1/M2/M3)!
 
 После публикации другие пользователи могут запустить:
 

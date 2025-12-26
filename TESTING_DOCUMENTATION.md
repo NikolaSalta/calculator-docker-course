@@ -664,44 +664,106 @@ docker compose -f docker-compose.reports.yml up -d
 
 ## 9. Docker-образ тестов
 
-### 9.1 Dockerfile
+### 9.1 Что внутри образа?
+
+**Версия 2.0** содержит всё необходимое для тестирования:
+
+| Компонент | Версия | Описание |
+|-----------|--------|----------|
+| **Python** | 3.12 | Язык тестов |
+| **Chromium** | latest | Браузер (встроен!) |
+| **ChromeDriver** | latest | Драйвер для Selenium |
+| **pytest** | 8.0.0 | Фреймворк тестирования |
+| **selenium** | 4.17.2 | Управление браузером |
+| **pytest-html** | 4.1.1 | HTML-отчёты |
+
+### 9.2 Multi-Platform образы
+
+**📦 Поддерживаемые архитектуры:**
+
+| Архитектура | Платформа | Где используется |
+|-------------|-----------|------------------|
+| **linux/amd64** | x86_64 | Windows, Linux, Intel Mac |
+| **linux/arm64** | aarch64 | Apple Silicon (M1/M2/M3), AWS Graviton |
+
+### 9.3 Docker Hub
+
+**🔗 Ссылки на образы:**
+
+| Тег | Описание | Ссылка |
+|-----|----------|--------|
+| `latest` | Последняя версия (multi-arch) | [nikolaysaltan/calculator-docker-tests:latest](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests) |
+| `v2.0-chromium` | Версия 2.0 с Chromium | [nikolaysaltan/calculator-docker-tests:v2.0-chromium](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=v2.0) |
+| `v2.0-multiarch` | Multi-platform (AMD64 + ARM64) | [nikolaysaltan/calculator-docker-tests:v2.0-multiarch](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=multiarch) |
+
+```bash
+# Скачать образ (автоматически выберет нужную архитектуру)
+docker pull nikolaysaltan/calculator-docker-tests:latest
+
+# Явно указать платформу
+docker pull --platform linux/amd64 nikolaysaltan/calculator-docker-tests:latest  # Windows/Linux
+docker pull --platform linux/arm64 nikolaysaltan/calculator-docker-tests:latest  # Apple M1/M2/M3
+```
+
+### 9.4 Два режима работы
+
+**Режим 1: STANDALONE (встроенный браузер)**
+
+```bash
+# Браузер уже внутри контейнера — дополнительных контейнеров не нужно!
+docker run --rm \
+  -e USE_EMBEDDED_BROWSER=true \
+  -e HEADLESS=true \
+  -e BACKEND_URL=http://host.docker.internal:8080 \
+  -e FRONTEND_URL=http://host.docker.internal:3001 \
+  -v $(pwd)/reports:/tests/reports \
+  nikolaysaltan/calculator-docker-tests:latest
+```
+
+**Режим 2: REMOTE (с noVNC для визуализации)**
+
+```bash
+# Браузер в отдельном контейнере — можно видеть тесты!
+docker compose -f docker-compose.selenium.yml up --build
+
+# Откройте http://localhost:7900 (пароль: secret)
+```
+
+### 9.5 Dockerfile
 
 ```dockerfile
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
+
+# Установка Chromium и ChromeDriver
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    chromium-driver \
+    fonts-liberation \
+    fonts-noto-color-emoji \
+    libnss3 libatk1.0-0 libatk-bridge2.0-0 \
+    libcups2 libdrm2 libxkbcommon0 \
+    libxcomposite1 libxdamage1 libxfixes3 \
+    libxrandr2 libgbm1 libasound2 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tests
 
-# Зависимости
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Тесты
 COPY pytest.ini conftest.py test_config.py .
 COPY test_api.py test_ui_selenium.py .
 
-# Директория для отчётов
 RUN mkdir -p /tests/reports
 
 ENV PYTHONUNBUFFERED=1
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
+ENV USE_EMBEDDED_BROWSER=true
+ENV HEADLESS=true
 
 ENTRYPOINT ["pytest"]
 CMD ["-v", "--html=/tests/reports/report.html", "--self-contained-html"]
-```
-
-### 9.2 Docker Hub
-
-**Образ опубликован:**
-
-🔗 https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests
-
-```bash
-# Скачать образ
-docker pull nikolaysaltan/calculator-docker-tests:latest
-
-# Использовать в docker-compose
-services:
-  tests:
-    image: nikolaysaltan/calculator-docker-tests:latest
 ```
 
 ---

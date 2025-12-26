@@ -1,94 +1,148 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# Dockerfile для тестов (pytest + Selenium)
+# Dockerfile для тестов (pytest + Selenium + Chromium)
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Этот образ содержит:
+# 🚀 ЭТОТ ОБРАЗ СОДЕРЖИТ ВСЁ НЕОБХОДИМОЕ:
 # - Python 3.12
+# - Chromium браузер
+# - ChromeDriver
 # - pytest и плагины
-# - requests (для API-тестов)
-# - selenium (для UI-тестов)
+# - selenium
 #
-# Тесты запускаются внутри контейнера и подключаются к:
-# - backend и frontend по сети Docker
-# - Selenium Grid для управления браузером
+# 🎯 ДВА РЕЖИМА РАБОТЫ:
+# 1. STANDALONE — браузер внутри контейнера (HEADLESS=true)
+# 2. REMOTE — подключение к внешнему Selenium Grid/noVNC (HEADLESS=false)
+#
+# 📦 MULTI-PLATFORM ОБРАЗ:
+# - linux/amd64 (x86_64) — для Windows, Linux, Intel Mac
+# - linux/arm64 (aarch64) — для Apple Silicon (M1/M2/M3)
 # ═══════════════════════════════════════════════════════════════════════════
 
 
-# Базовый образ: Python 3.12 на минимальном Alpine Linux
-# python:3.12-slim — меньше чем полный образ, но больше чем alpine
-# slim содержит необходимые библиотеки для большинства пакетов
-FROM python:3.12-slim
+# ─────────────────────────────────────────────────────────────────────────────
+# БАЗОВЫЙ ОБРАЗ
+# ─────────────────────────────────────────────────────────────────────────────
+# Используем Debian-based образ (не Alpine) для лучшей совместимости
+# с Chromium и его зависимостями
+FROM python:3.12-slim-bookworm
 
-# Устанавливаем рабочую директорию
-# Все последующие команды выполняются отсюда
+# Метаданные образа
+LABEL maintainer="nikolaysaltan"
+LABEL description="Calculator Docker Tests with embedded Chromium browser"
+LABEL version="2.0"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# УСТАНОВКА CHROMIUM И ЗАВИСИМОСТЕЙ
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Chromium — open-source версия Chrome
+# Он отлично работает с Selenium и доступен в репозиториях Debian
+#
+# Зависимости:
+# - chromium: сам браузер
+# - chromium-driver: WebDriver для управления браузером
+# - fonts-liberation: шрифты для корректного рендеринга
+# - libnss3: криптографическая библиотека (нужна Chrome)
+# - libatk1.0-0, libatk-bridge2.0-0: accessibility toolkit
+# - libdrm2: Direct Rendering Manager
+# - libxkbcommon0: обработка клавиатуры
+# - libgbm1: Generic Buffer Management (для GPU)
+# ─────────────────────────────────────────────────────────────────────────────
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Браузер и драйвер
+    chromium \
+    chromium-driver \
+    # Шрифты для корректного отображения текста
+    fonts-liberation \
+    fonts-noto-color-emoji \
+    # Библиотеки для работы Chromium
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    # Утилиты
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# ─────────────────────────────────────────────────────────────────────────────
+# НАСТРОЙКА CHROMIUM
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Создаём пользователя для запуска тестов (не root)
+# Chromium не рекомендуется запускать от root
+RUN groupadd -r testuser && useradd -r -g testuser testuser
+
+# Настройка путей к Chromium
+# В Debian Chromium устанавливается как "chromium" (не "chrome")
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
+
+# Переменная для использования встроенного браузера
+# Если USE_EMBEDDED_BROWSER=true — используем локальный Chromium
+# Если false — подключаемся к внешнему Selenium Grid
+ENV USE_EMBEDDED_BROWSER=true
+
+# HEADLESS режим по умолчанию включён для standalone работы
+ENV HEADLESS=true
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# УСТАНОВКА PYTHON ЗАВИСИМОСТЕЙ
+# ─────────────────────────────────────────────────────────────────────────────
+
 WORKDIR /tests
 
-# ─────────────────────────────────────────────────────────────────────────────
-# УСТАНОВКА ЗАВИСИМОСТЕЙ
-# ─────────────────────────────────────────────────────────────────────────────
-
-# Копируем файл зависимостей ОТДЕЛЬНО от остального кода
-# Это оптимизация для кеширования Docker-слоёв:
-# - Если requirements.txt не изменился → pip install берётся из кеша
-# - Даже если изменились файлы тестов
+# Копируем requirements.txt отдельно для кеширования
 COPY requirements.txt .
 
 # Устанавливаем Python-пакеты
-# --no-cache-dir — не сохранять pip cache (экономия места в образе)
 RUN pip install --no-cache-dir -r requirements.txt
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # КОПИРОВАНИЕ ТЕСТОВ
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Копируем конфигурацию pytest
 COPY pytest.ini .
-
-# Копируем Python-файлы тестов
 COPY conftest.py .
 COPY test_config.py .
 COPY test_api.py .
 COPY test_ui_selenium.py .
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # ПОДГОТОВКА ДИРЕКТОРИЙ
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Создаём директорию для отчётов
-# pytest-html будет сохранять HTML-отчёт сюда
-# Через volume эта папка монтируется на хост
-RUN mkdir -p /tests/reports
+RUN mkdir -p /tests/reports && chown -R testuser:testuser /tests
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # НАСТРОЙКИ ОКРУЖЕНИЯ
 # ─────────────────────────────────────────────────────────────────────────────
 
-# PYTHONUNBUFFERED=1 — отключить буферизацию вывода Python
-# Без этого print() и логи могут не отображаться в docker logs
-# Буферизация может задерживать вывод до заполнения буфера
 ENV PYTHONUNBUFFERED=1
+
+# Переключаемся на непривилегированного пользователя
+USER testuser
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ЗАПУСК
 # ─────────────────────────────────────────────────────────────────────────────
 
-# ENTRYPOINT — базовая команда, которая всегда выполняется
-# ["pytest"] — запустить pytest
-#
-# Отличие ENTRYPOINT от CMD:
-# - ENTRYPOINT — "что запускать"
-# - CMD — "с какими аргументами"
-#
-# docker run tests → запустит: pytest -v --html=...
-# docker run tests -m smoke → запустит: pytest -m smoke
 ENTRYPOINT ["pytest"]
-
-# CMD — аргументы по умолчанию для ENTRYPOINT
-# Эти аргументы можно переопределить при запуске контейнера
-#
-# -v — verbose (подробный вывод)
-# --html=... — генерировать HTML-отчёт
-# --self-contained-html — встроить CSS/JS в HTML (один файл)
 CMD ["-v", "--html=/tests/reports/report.html", "--self-contained-html"]
 
 
@@ -96,13 +150,28 @@ CMD ["-v", "--html=/tests/reports/report.html", "--self-contained-html"]
 # ИСПОЛЬЗОВАНИЕ
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Запустить все тесты (через compose):
-#   docker compose -f docker-compose.test.yml up --build
+# 🎯 РЕЖИМ 1: STANDALONE (браузер внутри контейнера)
+# ─────────────────────────────────────────────────────────────────────────
+#   docker run --rm \
+#     -e USE_EMBEDDED_BROWSER=true \
+#     -e HEADLESS=true \
+#     -e BACKEND_URL=http://host.docker.internal:8080 \
+#     -e FRONTEND_URL=http://host.docker.internal:3001 \
+#     -v $(pwd)/reports:/tests/reports \
+#     nikolaysaltan/calculator-docker-tests:latest
 #
-# Запустить конкретные тесты:
-#   docker compose -f docker-compose.test.yml run tests pytest -m smoke
-#   docker compose -f docker-compose.test.yml run tests pytest -m api
-#   docker compose -f docker-compose.test.yml run tests pytest test_api.py -v
+# 🎯 РЕЖИМ 2: С ВНЕШНИМ SELENIUM GRID (noVNC)
+# ─────────────────────────────────────────────────────────────────────────
+#   docker compose -f docker-compose.selenium.yml up --build
 #
-# Отчёт будет в ./test-reports/report.html
+# 📦 MULTI-PLATFORM СБОРКА:
+# ─────────────────────────────────────────────────────────────────────────
+#   # Создать builder
+#   docker buildx create --name multiplatform --use
+#
+#   # Собрать и загрузить для ARM64 и AMD64
+#   docker buildx build --platform linux/amd64,linux/arm64 \
+#     -t nikolaysaltan/calculator-docker-tests:latest \
+#     --push .
+#
 # ═══════════════════════════════════════════════════════════════════════════

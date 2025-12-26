@@ -204,13 +204,44 @@ open ./test-reports/report.html
 
 > 📖 **Полная документация:** [TESTING_DOCUMENTATION.md](TESTING_DOCUMENTATION.md)
 
+### 📦 Docker-образ тестов (Multi-Platform)
+
+| Архитектура | Платформа | Поддержка |
+|-------------|-----------|-----------|
+| `linux/amd64` | x86_64 | Windows, Linux, Intel Mac |
+| `linux/arm64` | aarch64 | Apple Silicon (M1/M2/M3) |
+
+```bash
+# Скачать образ (автоматический выбор архитектуры)
+docker pull nikolaysaltan/calculator-docker-tests:latest
+
+# Запуск с встроенным браузером (Chromium внутри контейнера!)
+docker run --rm \
+  -e USE_EMBEDDED_BROWSER=true \
+  -e HEADLESS=true \
+  -e BACKEND_URL=http://host.docker.internal:8080 \
+  -e FRONTEND_URL=http://host.docker.internal:3001 \
+  -v $(pwd)/reports:/tests/reports \
+  nikolaysaltan/calculator-docker-tests:latest
+```
+
+### 🎬 Визуальное тестирование (noVNC)
+
+```bash
+# Запустить тесты с визуализацией браузера
+docker compose -f docker-compose.selenium.yml up --build
+
+# Открыть http://localhost:7900 (пароль: secret)
+# Смотрите тесты в реальном времени!
+```
+
 ### Просмотр отчётов в браузере
 
 ```bash
 # Запустить сервер отчётов (после выполнения тестов)
 docker compose -f docker-compose.reports.yml up -d
 
-# Открыть http://localhost:9000/report.html
+# Открыть http://localhost:9001/report.html
 ```
 
 ### Запуск всех тестов
