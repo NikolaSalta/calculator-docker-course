@@ -18,3 +18,5 @@ chromium --no-sandbox --disable-dev-shm-usage --start-maximized http://localhost
 # Запускаем noVNC
 cd /opt/novnc/utils && ./websockify --web=/opt/novnc 6080 localhost:5901
 
+
+

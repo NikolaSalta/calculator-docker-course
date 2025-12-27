@@ -136,9 +136,11 @@ calculator/
 │   ├── test_api.py         # API-тесты
 │   └── test_ui_selenium.py # UI-тесты
 │
-├── docker-compose.yml          # Основной compose
+├── docker-compose.yml          # Основной compose (backend + frontend)
+├── docker-compose.all.yml      # Все сервисы (backend + frontend + tests)
 ├── docker-compose.test.yml     # Compose с API-тестами
-└── docker-compose.selenium.yml # Compose с Selenium-тестами
+├── docker-compose.selenium.yml # Compose с Selenium-тестами
+└── docker-compose.reports.yml  # Сервер для просмотра HTML-отчётов
 ```
 
 ## 🔧 Режимы запуска
@@ -174,29 +176,49 @@ open http://localhost:3001
 ### 2. Docker Compose (рекомендуется)
 
 ```bash
+# Запустить только backend и frontend
 docker compose up --build -d
 ```
 
-### 3. С тестами
+### 3. Все сервисы одновременно (новое!)
 
 ```bash
-# API-тесты
+# Запустить backend, frontend и тесты одной командой
+docker compose -f docker-compose.all.yml up --build
+
+# Или в фоновом режиме (тесты выполнятся и завершатся)
+docker compose -f docker-compose.all.yml up --build -d
+
+# Запустить тесты вручную (когда backend и frontend уже запущены)
+docker compose -f docker-compose.all.yml run --rm tests pytest -v
+```
+
+### 4. С тестами
+
+```bash
+# Запуск всех сервисов одновременно (backend + frontend + tests)
+docker compose -f docker-compose.all.yml up --build
+
+# Только API-тесты
 docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
 
 # Selenium UI-тесты
 docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
 
-# Отчёт
-open ./test-reports/report.html
+# Просмотр отчётов через веб-сервер
+docker compose -f docker-compose.reports.yml up -d
+# Открыть http://localhost:9000/report.html
 ```
 
 ## 🌐 Endpoints
 
 | URL                              | Описание                              |
 | -------------------------------- | ------------------------------------- |
-| http://localhost:3001            | UI калькулятора                       |
+| http://localhost:3001            | UI калькулятора (React + nginx)       |
 | http://localhost:8080/api/health | Health check                          |
 | http://localhost:8080/api/calc   | API вычислений                        |
+| http://localhost:7900            | noVNC (визуальный доступ к браузеру)  |
+| http://localhost:9000/report.html| HTML-отчёты тестов                    |
 | http://localhost:4444            | Selenium Grid UI (при запуске тестов) |
 
 ## 📚 API Reference
@@ -280,7 +302,7 @@ docker compose -f docker-compose.selenium.yml up --build
 # Запустить сервер отчётов (после выполнения тестов)
 docker compose -f docker-compose.reports.yml up -d
 
-# Открыть http://localhost:9001/report.html
+# Открыть http://localhost:9000/report.html
 ```
 
 ### Запуск всех тестов

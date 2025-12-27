@@ -105,6 +105,9 @@ RUN cd /opt/novnc/utils && \
     tar -xzf websockify.tar.gz --strip-components=1 && \
     rm -f websockify.tar.gz
 
+# Создаём index.html для доступа к noVNC через корневой путь
+RUN cd /opt/novnc && ln -sf vnc.html index.html
+
 # ─────────────────────────────────────────────────────────────────────────────
 # НАСТРОЙКА NGINX
 # ─────────────────────────────────────────────────────────────────────────────
@@ -139,65 +142,56 @@ RUN su vncuser -c "x11vnc -storepasswd secret /home/vncuser/.vnc/passwd" || \
 # СКРИПТ ЗАПУСКА
 # ─────────────────────────────────────────────────────────────────────────────
 
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# Запускаем nginx в фоне\n\
-nginx -g "daemon off;" &\n\
-\n\
-# Ждём пока nginx запустится и React-приложение станет доступно\n\
-echo "⏳ Ожидание nginx..."\n\
-for i in {1..10}; do\n\
-  if curl -s http://localhost | grep -q "Docker Calculator"; then\n\
-    echo "✅ Nginx готов!"\n\
-    break\n\
-  fi\n\
-  sleep 1\n\
-done\n\
-\n\
-# Запускаем виртуальный дисплей\n\
-export DISPLAY=:99\n\
-Xvfb :99 -screen 0 1920x1080x24 &\n\
-sleep 2\n\
-\n\
-# Запускаем оконный менеджер\n\
-fluxbox &\n\
-sleep 2\n\
-\n\
-# Запускаем VNC сервер\n\
-x11vnc -display :99 -nopw -listen localhost -xkb -ncache 10 -ncache_cr -forever -shared -rfbport 5901 &\n\
-sleep 2\n\
-\n\
-# Дополнительная проверка nginx\n\
-echo "🔍 Проверяем nginx..."\n\
-for i in {1..5}; do\n\
-  if curl -s http://localhost:80 | grep -q "Docker Calculator"; then\n\
-    echo "✅ React-приложение доступно!"\n\
-    break\n\
-  fi\n\
-  echo "⏳ Ждём nginx... ($i/5)"\n\
-  sleep 2\n\
-done\n\
-\n\
-# Открываем браузер с приложением\n\
-echo "🌐 Открываем браузер с приложением..."\n\
-chromium --no-sandbox --disable-dev-shm-usage --start-maximized --display=:99 \\\n\
-  --disable-web-security --disable-features=VizDisplayCompositor \\\n\
-  --force-device-scale-factor=1 --new-window \\\n\
-  --app=http://localhost:80 &\n\
-sleep 5\n\
-\n\
-# Запускаем noVNC\n\
-cd /opt/novnc/utils && python3 -m websockify --web=/opt/novnc 6080 localhost:5901 &\n\
-\n\
-echo "✅ Frontend запущен!"\n\
-echo "🌐 Приложение: http://localhost:3001"\n\
-echo "🖥️  noVNC (браузер): http://localhost:7900"\n\
-\n\
-# Держим контейнер живым\n\
-wait\n\
-' > /entrypoint.sh && \
-    chmod +x /entrypoint.sh
+RUN cat << 'EOF' > /entrypoint.sh && chmod +x /entrypoint.sh
+#!/bin/bash
+set -e
+
+nginx -g "daemon off;" &
+
+echo "⏳ Ожидание nginx..."
+for i in {1..10}; do
+  if curl -s http://localhost | grep -q "Docker Calculator"; then
+    echo "✅ Nginx готов!"
+    break
+  fi
+  sleep 1
+done
+
+export DISPLAY=:99
+Xvfb :99 -screen 0 1920x1080x24 &
+sleep 2
+
+fluxbox &
+sleep 2
+
+x11vnc -display :99 -nopw -listen localhost -xkb -ncache 10 -ncache_cr -forever -shared -rfbport 5901 &
+sleep 2
+
+cd /opt/novnc/utils && python3 -m websockify --web=/opt/novnc 6080 localhost:5901 &
+
+echo "🔍 Проверяем nginx..."
+for i in {1..5}; do
+  if curl -s http://localhost:80 | grep -q "Docker Calculator"; then
+    echo "✅ React-приложение доступно!"
+    break
+  fi
+  echo "⏳ Ждём nginx... ($i/5)"
+  sleep 2
+done
+
+echo "🌐 Открываем браузер с приложением..."
+chromium --no-sandbox --disable-dev-shm-usage --start-maximized --display=:99 \
+  --disable-features=VizDisplayCompositor \
+  --force-device-scale-factor=1 --new-window \
+  --app=http://localhost:80 &
+sleep 5
+
+echo "✅ Frontend запущен!"
+echo "🌐 Приложение: http://localhost:3001"
+echo "🖥️  noVNC (браузер): http://localhost:7900"
+
+wait
+EOF
 
 EXPOSE 80 5901 6080
 

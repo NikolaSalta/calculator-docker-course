@@ -1,73 +1,99 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# docker-compose.test.yml — Compose файл для запуска API-тестов
+# docker-compose.all.yml — Единый файл для всех контейнеров
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Этот файл добавляет тестовый контейнер к основному приложению.
-# Тесты запускаются ПОСЛЕ того, как приложение готово.
+# Этот файл включает все три контейнера: backend, frontend и tests.
+# Все контейнеры собираются одновременно при запуске.
 #
 # Использование:
-#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+#   # Запустить все контейнеры (без тестов):
+#   docker compose -f docker-compose.all.yml up --build -d
 #
-# Флаг --abort-on-container-exit:
-#   Останавливает все контейнеры, когда тесты завершаются.
-#   Без него приложение продолжит работать после окончания тестов.
+#   # Запустить все включая тесты:
+#   docker compose -f docker-compose.all.yml up --build
+#
+#   # Запустить только тесты вручную:
+#   docker compose -f docker-compose.all.yml run --rm tests pytest -v
+#
+#   # Пересобрать все контейнеры:
+#   docker compose -f docker-compose.all.yml build --no-cache
+#
 # ═══════════════════════════════════════════════════════════════════════════
-
-version: '3.8'
 
 services:
 
   # ─────────────────────────────────────────────────────────────────────────
-  # BACKEND (идентичен основному compose)
+  # BACKEND SERVICE
   # ─────────────────────────────────────────────────────────────────────────
   backend:
     build: ./backend
-    container_name: calc-backend-test
+    container_name: calc-backend
     
-    # Порты для доступа к backend
     ports:
       - "8080:8080"
     
-    # healthcheck важен для тестов!
-    # Тесты должны дождаться, пока backend будет готов
+    # Healthcheck для проверки готовности сервиса
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
-      interval: 5s        # Проверять каждые 5 секунд (чаще для тестов)
-      timeout: 3s
-      retries: 10         # Больше попыток для медленного старта
-      start_period: 30s   # Начальный период: не считать неудачи первые 30 сек
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s  # Даём время на запуск Spring Boot
+    
+    # Ограничения ресурсов (защита от утечек памяти)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    
+    # Переменные окружения
+    environment:
+      - JAVA_OPTS=-Xmx384m -Xms128m
+
 
   # ─────────────────────────────────────────────────────────────────────────
-  # FRONTEND
+  # FRONTEND SERVICE
   # ─────────────────────────────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.compose
-    container_name: calc-frontend-test
     
-    # Порты для доступа к frontend и просмотра браузера
+    container_name: calc-frontend
+    
+    # Порты:
+    # - 3001:80 — веб-приложение (nginx)
+    # - 5901:5901 — VNC сервер (для прямого подключения)
+    # - 7900:6080 — noVNC (веб-доступ к браузеру)
     ports:
-      - "3001:80"      # Веб-приложение (nginx)
-      - "5901:5901"    # VNC сервер (для прямого подключения)
-      - "7900:6080"    # noVNC (веб-доступ к браузеру)
+      - "3001:80"
+      - "5901:5901"
+      - "7900:6080"
     
+    # Ждём пока backend станет healthy
     depends_on:
       backend:
-        # condition: service_healthy — ждать пока backend станет healthy
-        # Это РЕАЛЬНОЕ ожидание готовности, не просто порядок запуска
         condition: service_healthy
+    
+    # Ограничения ресурсов (увеличено для браузера)
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
 
   # ─────────────────────────────────────────────────────────────────────────
   # TESTS — контейнер с тестами
   # ─────────────────────────────────────────────────────────────────────────
   tests:
-    # build: ./tests — собрать образ из Dockerfile в папке tests
     build: ./tests
     container_name: calc-tests
     
     # environment — переменные окружения для тестов
-    # Тесты используют эти переменные для подключения к сервисам
     environment:
       # URL backend-сервиса (имя сервиса в compose)
       - BACKEND_URL=http://backend:8080
@@ -77,6 +103,13 @@ services:
       
       # Сколько секунд ждать готовности сервисов
       - STARTUP_WAIT=60
+      
+      # Использовать встроенный браузер (Chromium внутри контейнера)
+      # Это позволяет запускать тесты без дополнительного Selenium Grid
+      - USE_EMBEDDED_BROWSER=true
+      
+      # Headless режим (без GUI)
+      - HEADLESS=true
     
     # depends_on — тесты запускаются после готовности приложения
     depends_on:
@@ -86,40 +119,37 @@ services:
         condition: service_started   # Frontend достаточно просто запустить
     
     # volumes — подключение директорий хоста к контейнеру
-    # Формат: "путь_на_хосте:путь_в_контейнере"
-    #
-    # ./test-reports — папка на твоём компьютере
-    # /tests/reports — папка внутри контейнера
-    #
-    # pytest сохранит HTML-отчёт в /tests/reports/report.html
-    # Благодаря volume, файл появится в ./test-reports/report.html на хосте
     volumes:
       - ./test-reports:/tests/reports
     
-    # command — переопределение CMD из Dockerfile
-    # Запускаем только smoke и api тесты (без Selenium)
-    # -v — verbose (подробный вывод)
-    # -m "smoke or api" — только тесты с маркерами smoke или api
-    # --html=... — генерировать HTML-отчёт
-    # --self-contained-html — CSS и JS встроены в HTML (один файл)
-    command: [
-      "-v",
-      "-m", "smoke or api",
-      "--html=/tests/reports/report.html",
-      "--self-contained-html"
-    ]
+    # Тесты собираются вместе с остальными контейнерами,
+    # но НЕ запускаются автоматически при docker compose up -d
+    # Для запуска тестов используйте:
+    #   docker compose -f docker-compose.all.yml run --rm tests pytest -v
+    # Или запустите все контейнеры включая тесты:
+    #   docker compose -f docker-compose.all.yml up --build
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ИСПОЛЬЗОВАНИЕ
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Запустить тесты:
-#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
+# Запустить backend и frontend (без тестов):
+#   docker compose -f docker-compose.all.yml up --build -d
 #
-# Только smoke-тесты:
-#   docker compose -f docker-compose.test.yml run --rm tests pytest -m smoke
+# Запустить все включая тесты (тесты запустятся автоматически):
+#   docker compose -f docker-compose.all.yml up --build
 #
-# Посмотреть отчёт:
-#   open ./test-reports/report.html
+# Запустить только тесты вручную (когда backend и frontend уже запущены):
+#   docker compose -f docker-compose.all.yml run --rm tests pytest -v -m "smoke or api"
+#
+# Пересобрать все контейнеры:
+#   docker compose -f docker-compose.all.yml build --no-cache
+#
+# Посмотреть статус:
+#   docker compose -f docker-compose.all.yml ps
+#
+# Остановить все:
+#   docker compose -f docker-compose.all.yml down
 # ═══════════════════════════════════════════════════════════════════════════
+

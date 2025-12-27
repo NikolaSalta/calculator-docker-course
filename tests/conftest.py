@@ -366,13 +366,13 @@ def browser():
         # ═══════════════════════════════════════════════════════════════════
         # РЕЖИМ 2: УДАЛЁННЫЙ SELENIUM (с noVNC)
         # ═══════════════════════════════════════════════════════════════════
-        #
-        # webdriver.Remote — создаёт WebDriver для удалённого браузера
-        #
-        # Почему "удалённый"?
-        # Браузер Chrome запущен в ДРУГОМ контейнере (selenium-chrome).
+    #
+    # webdriver.Remote — создаёт WebDriver для удалённого браузера
+    #
+    # Почему "удалённый"?
+    # Браузер Chrome запущен в ДРУГОМ контейнере (selenium-chrome).
         # Мы подключаемся к нему по сети через Selenium.
-        #
+    #
         # SELENIUM_REMOTE_URL — для standalone-chrome с VNC
         # Формат: http://selenium-chrome:4444/wd/hub
         #
@@ -382,12 +382,12 @@ def browser():
         # - Наблюдать как тесты кликают, вводят текст
         print(f"🌐 Режим: REMOTE SELENIUM ({SELENIUM_REMOTE_URL})")
         
-        driver = webdriver.Remote(
+    driver = webdriver.Remote(
             # URL Selenium (standalone-chrome или Hub)
             command_executor=SELENIUM_REMOTE_URL,
-            # Настройки браузера
-            options=options
-        )
+        # Настройки браузера
+        options=options
+    )
     
     # ─────────────────────────────────────────────────────────────────────────
     # IMPLICIT WAIT
@@ -498,6 +498,6 @@ def pytest_html_results_table_row(report, cells):
                     details_match = re.search(r'<small>(.*?)</small>', content, re.DOTALL)
                     if details_match:
                         description += f"<br><small style='color: #666;'>{details_match.group(1)}</small>"
-                    break
-    
+                        break
+        
     cells.insert(2, f'<td style="max-width: 350px; word-wrap: break-word; text-align: left;">{description}</td>')
