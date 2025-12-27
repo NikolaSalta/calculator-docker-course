@@ -5,6 +5,7 @@
 ## 📋 Описание
 
 Этот проект создан для обучения Docker на практике. Включает:
+
 - **Backend**: Java Spring Boot REST API
 - **Frontend**: React SPA + nginx
 - **Tests**: pytest + Selenium
@@ -23,6 +24,7 @@
 **Подробная инструкция:** [TEACHER_GUIDE.md](TEACHER_GUIDE.md)
 
 Содержит:
+
 - Пошаговый план урока с конкретными командами
 - Сценарии демонстрации (быстрый старт и пошаговая сборка)
 - Практические задания для студентов
@@ -32,32 +34,50 @@
 ## 🚀 Быстрый старт
 
 ### Требования
+
 - Docker Desktop (Mac/Windows) или Docker Engine (Linux)
 - Git
 
 ### 📦 Готовые образы на Docker Hub
 
-#### 🍎 Apple Silicon (ARM64) — Mac M1/M2/M3
+> **Последнее обновление:** 27 декабря 2025
+>
+> Образы используют легкие базовые образы для минимального размера:
+>
+> - Backend: `eclipse-temurin:17-jre` (~130 MB)
+> - Frontend: `nginx:alpine` (~25 MB)
+> - Tests: `python:3.12-slim` + Chromium (~330 MB)
 
-| Компонент | Команда скачивания | Ссылка на Docker Hub |
-|-----------|-------------------|---------------------|
-| **Backend** | `docker pull nikolaysaltan/calculator-docker-backend:arm64` | [🔗 Backend ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=arm64) |
+#### 🍎 Apple Silicon (ARM64) — Mac M1/M2/M3/M4
+
+| Компонент    | Команда скачивания                                           | Ссылка на Docker Hub                                                                                   |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **Backend**  | `docker pull nikolaysaltan/calculator-docker-backend:arm64`  | [🔗 Backend ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=arm64)   |
 | **Frontend** | `docker pull nikolaysaltan/calculator-docker-frontend:arm64` | [🔗 Frontend ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=arm64) |
-| **Tests** | `docker pull nikolaysaltan/calculator-docker-tests:arm64` | [🔗 Tests ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=arm64) |
+| **Tests**    | `docker pull nikolaysaltan/calculator-docker-tests:arm64`    | [🔗 Tests ARM64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=arm64)       |
 
 #### 💻 x86_64 (AMD64) — Windows, Linux, Intel Mac
 
-| Компонент | Команда скачивания | Ссылка на Docker Hub |
-|-----------|-------------------|---------------------|
-| **Backend** | `docker pull nikolaysaltan/calculator-docker-backend:amd64` | [🔗 Backend AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=amd64) |
+| Компонент    | Команда скачивания                                           | Ссылка на Docker Hub                                                                                   |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **Backend**  | `docker pull nikolaysaltan/calculator-docker-backend:amd64`  | [🔗 Backend AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend/tags?name=amd64)   |
 | **Frontend** | `docker pull nikolaysaltan/calculator-docker-frontend:amd64` | [🔗 Frontend AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend/tags?name=amd64) |
-| **Tests** | `docker pull nikolaysaltan/calculator-docker-tests:amd64` | [🔗 Tests AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64) |
+| **Tests**    | `docker pull nikolaysaltan/calculator-docker-tests:amd64`    | [🔗 Tests AMD64](https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests/tags?name=amd64)       |
 
 #### 📋 Общие ссылки на репозитории
 
 - **Backend**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-backend
 - **Frontend**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-frontend
 - **Tests**: https://hub.docker.com/r/nikolaysaltan/calculator-docker-tests
+
+#### 🌐 Универсальный (Multi-platform)
+
+```bash
+# Автоматически выберет образ для вашей платформы
+docker pull nikolaysaltan/calculator-docker-backend:latest
+docker pull nikolaysaltan/calculator-docker-frontend:latest
+docker pull nikolaysaltan/calculator-docker-tests:latest
+```
 
 ### Вариант 1: Запуск из готовых образов (быстро!)
 
@@ -172,12 +192,12 @@ open ./test-reports/report.html
 
 ## 🌐 Endpoints
 
-| URL | Описание |
-|-----|----------|
-| http://localhost:3001 | UI калькулятора |
-| http://localhost:8080/api/health | Health check |
-| http://localhost:8080/api/calc | API вычислений |
-| http://localhost:4444 | Selenium Grid UI (при запуске тестов) |
+| URL                              | Описание                              |
+| -------------------------------- | ------------------------------------- |
+| http://localhost:3001            | UI калькулятора                       |
+| http://localhost:8080/api/health | Health check                          |
+| http://localhost:8080/api/calc   | API вычислений                        |
+| http://localhost:4444            | Selenium Grid UI (при запуске тестов) |
 
 ## 📚 API Reference
 
@@ -186,6 +206,7 @@ open ./test-reports/report.html
 Выполнить вычисление.
 
 **Request:**
+
 ```json
 {
   "a": 10,
@@ -195,6 +216,7 @@ open ./test-reports/report.html
 ```
 
 **Response:**
+
 ```json
 {
   "result": 15.0,
@@ -209,6 +231,7 @@ open ./test-reports/report.html
 Проверка состояния сервиса.
 
 **Response:**
+
 ```json
 {
   "status": "OK",
@@ -222,10 +245,10 @@ open ./test-reports/report.html
 
 ### 📦 Docker-образ тестов (Multi-Platform)
 
-| Архитектура | Платформа | Поддержка |
-|-------------|-----------|-----------|
-| `linux/amd64` | x86_64 | Windows, Linux, Intel Mac |
-| `linux/arm64` | aarch64 | Apple Silicon (M1/M2/M3) |
+| Архитектура   | Платформа | Поддержка                 |
+| ------------- | --------- | ------------------------- |
+| `linux/amd64` | x86_64    | Windows, Linux, Intel Mac |
+| `linux/arm64` | aarch64   | Apple Silicon (M1/M2/M3)  |
 
 ```bash
 # Скачать образ (автоматический выбор архитектуры)
@@ -261,21 +284,25 @@ docker compose -f docker-compose.reports.yml up -d
 ```
 
 ### Запуск всех тестов
+
 ```bash
 docker compose -f docker-compose.selenium.yml up --build --abort-on-container-exit
 ```
 
 ### Только smoke-тесты
+
 ```bash
 docker compose -f docker-compose.test.yml run --rm tests pytest -m smoke
 ```
 
 ### Только API-тесты
+
 ```bash
 docker compose -f docker-compose.test.yml run --rm tests pytest -m api
 ```
 
 ### Только UI-тесты
+
 ```bash
 docker compose -f docker-compose.selenium.yml run --rm tests pytest -m ui_selenium
 ```
@@ -283,6 +310,7 @@ docker compose -f docker-compose.selenium.yml run --rm tests pytest -m ui_seleni
 ## 🐛 Отладка
 
 ### Посмотреть логи
+
 ```bash
 docker compose logs -f
 docker compose logs backend
@@ -290,12 +318,14 @@ docker compose logs frontend
 ```
 
 ### Зайти внутрь контейнера
+
 ```bash
 docker exec -it calc-backend sh
 docker exec -it calc-frontend sh
 ```
 
 ### Проверить сеть
+
 ```bash
 docker network ls
 docker inspect calc-backend --format '{{json .NetworkSettings.Networks}}'
@@ -324,8 +354,8 @@ docker system prune -a  # ОСТОРОЖНО: удалит всё неиспол
   - 📝 Тест (выбор правильного ответа)
   - Фильтрация по категориям (Docker основы, Dockerfile, Сети, Compose, Команды, Тестирование)
   - 64 вопроса с детальными ответами
-  
 - **`pdf_diagrams/`** — PDF-диаграммы архитектуры и процессов:
+
   - `01_docker_architecture.drawio.pdf` — архитектура Docker
   - И другие схемы для визуального понимания концепций
 
